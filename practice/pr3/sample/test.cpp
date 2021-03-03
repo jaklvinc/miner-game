@@ -21,34 +21,76 @@ struct Contact
 
 bool report ( const string & fileName, ostream & out )
 {
-    ifstream file;
-    file.open(fileName);
-    if (!file)
+  ifstream file;
+  file.open(fileName);
+  if (!file)
+  {
+    return false;
+  }
+  vector <Contact> Phonebook;
+  string Name;
+  string Surname;
+  string Number;
+  string Catch_me;
+
+  string dataline;
+  
+  while ( getline(file,dataline) )
+  {
+    if ( dataline == "" )
+      break;
+    stringstream iss(dataline);
+    iss >> Name >> Surname >> Number >> Catch_me;
+    
+    if ((Name == "") || 
+        (Surname == "") || 
+        (Number == "") || 
+        (Catch_me != "") || 
+        (Number.length() != 9) ||
+        (Number[0] == '0'))
     {
-        cerr << "ERROR, can't read file!" << endl;
-        return false;
+      //cout << "*" << endl;
+      return false;
     }
-    string dataline;
-    getline(file,dataline);
+
+    for ( auto i : Number )
+    {
+      if (!isdigit(i))
+      {
+        //cout << "*" << endl;
+        return false;
+      }
+    }
+
+    Contact contact;
+    contact.m_Name=Name;
+    contact.m_Surname=Surname;
+    contact.m_Number=Number;
+    Phonebook.push_back(contact);
+  }
 
 
-
-    vector <Contact> Phonebook;
-    string Name;
+  
+  while ( getline(file,dataline) )
+  {
+    /*getline(file,dataline);
+    if (dataline == "")
+      break;*/
+    Name = dataline;
     int Times_found=0;
-
     for (auto & Contact : Phonebook)
     {
-        if (Contact.m_Name == Name || Contact.m_Surname == Name )
-        {
-            Times_found++;
-            out << Contact.m_Name << " " << Contact.m_Surname << " " << Contact.m_Number << "\n";
-        }
+      if (Contact.m_Name == Name || Contact.m_Surname == Name )
+      {
+        Times_found++;
+        out << Contact.m_Name << " " << Contact.m_Surname << " " << Contact.m_Number << "\n";
+      }
     }
     out << "-> " << Times_found << "\n";
+  }
 
 
-    file.close();
+  file.close();
   return true;
 }
 
@@ -57,6 +99,8 @@ int main ()
 {
   ostringstream oss;
   oss . str ( "" );
+  report( "tests/test_me_in.txt", oss );
+  oss . str ("");
   assert ( report( "tests/test0_in.txt", oss ) == true );
   assert ( oss . str () ==
     "John Christescu 258452362\n"
