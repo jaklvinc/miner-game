@@ -84,6 +84,6 @@ bool  filterFile          ( const char      * srcFileName,
 
 int main()
 {
-    filterFile("in_0000.in","out.out","cz");
+    filterFile("in_0000.in","out_0000_cs.out","cs");
     return 0;
 }
