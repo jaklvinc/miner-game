@@ -48,7 +48,8 @@ struct AudioList
 struct AudioData
 {
     uint32_t m_ID;
-    string   m_Language;
+    char     m_FirstLang;
+    char     m_SecondLang;
     uint32_t m_Payload;
 };
 
@@ -59,6 +60,9 @@ bool  filterFile          ( const char      * srcFileName,
     ifstream input;
     ofstream output;
     Header header;
+    int32_t CRC;
+    const int32_t zero = 0;
+
     input.open(srcFileName,ios::binary);
     if (!input)
         return false;
@@ -123,6 +127,11 @@ bool  filterFile          ( const char      * srcFileName,
             output.write((char*)&buffer,1);
         }
 
+        input.read((char*)&CRC,4);
+        output.write((char*)&zero,4);
+
+        // AUDIO LIST STARTS
+
         input.read((char*)&audio_list.m_ID,4);
         output.write((char*)&audio_list.m_ID,4);
         if (audio_list.m_ID!=AUDIO_LIST_ID)
@@ -142,11 +151,37 @@ bool  filterFile          ( const char      * srcFileName,
         {
             AudioData audio_data;
             input.read((char*)&audio_data.m_ID,4);
-            input.read((char*)&audio_data.m_Language,2);
+            input.read((char*)&audio_data.m_FirstLang,1);
+            input.read((char*)&audio_data.m_SecondLang,1);
             input.read((char*)&audio_data.m_Payload,4);
-            cout << audio_data.m_Language;
+            
+            if ( (audio_data.m_FirstLang == lang[0]) && (audio_data.m_SecondLang == lang[1] ) )
+            {
+                output.write((char*)&audio_data.m_ID,4);
+                output.write((char*)&audio_data.m_FirstLang,1);
+                output.write((char*)&audio_data.m_SecondLang,1);
+                output.write((char*)&audio_data.m_Payload,4);
+
+                for ( uint32_t k = 0 ; k<audio_data.m_Payload ; k++)
+                {
+                    int32_t buffer;
+                    input.read((char*)&buffer,1);
+                    output.write((char*)&buffer,1);
+                }
+
+                input.read((char*)&CRC,4);
+                output.write((char*)&zero,4);
+            }
         }
+        input.read((char*)&CRC,4);
+        output.write((char*)&zero,4);
+
+        input.read((char*)&CRC,4);
+        output.write((char*)&zero,4);
     }
+
+    input.read((char*)&CRC,4);
+    output.write((char*)&zero,4);
 
     input.close();
     output.close();
