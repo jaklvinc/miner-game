@@ -60,7 +60,16 @@ struct Header
     vector <Frame> m_Frames;
 };
 
-
+void ChangeEndianness  ( uint32_t & Origin , const uint32_t EID )
+{
+    if (EID==BIG_ENDIAN_ID)
+    {
+    unsigned char * OriginStringed = (unsigned char *) &Origin;
+    Origin =    (uint32_t)OriginStringed[3] | (uint32_t)OriginStringed[2]<<8 |
+                (uint32_t)OriginStringed[1]<<16 | (uint32_t)OriginStringed[0]<<24;
+    }
+    return;
+}
 
 
 
@@ -95,6 +104,11 @@ bool  filterFile          ( const char      * srcFileName,
     if (!((header.m_ID==BIG_ENDIAN_ID)||(header.m_ID==LITTLE_ENDIAN_ID)))
         return false;
 
+    
+    ChangeEndianness(header.m_FrameCount,header.m_ID);
+    ChangeEndianness(header.m_InPayload,header.m_ID);
+
+
     for ( uint32_t i=0 ; i<header.m_FrameCount ; i++ )
     {
         Frame frame;
@@ -104,6 +118,8 @@ bool  filterFile          ( const char      * srcFileName,
             !input.read((char*)&frame.m_InPayload,4))
             return false;
         
+        ChangeEndianness(frame.m_InPayload,header.m_ID);
+
         header.m_Payload+=8;
         int FrameStart = input.tellg();
 
@@ -120,6 +136,8 @@ bool  filterFile          ( const char      * srcFileName,
         if (! input.read((char*)&video_data.m_ID,4) ||
             ! input.read((char*)&video_data.m_Payload,4) )
             return false;
+        
+        ChangeEndianness(video_data.m_Payload,header.m_ID);
         
         header.m_Payload+=8;
         header.m_Frames[i].m_Payload+=8;
@@ -143,6 +161,9 @@ bool  filterFile          ( const char      * srcFileName,
             !input.read((char*)&audio_list.m_InPayload,4) )
             return false;
         
+        ChangeEndianness(audio_list.m_AudioCount,header.m_ID);
+        ChangeEndianness(audio_list.m_InPayload,header.m_ID);
+        
         int AudioStart = input.tellg();
         header.m_Payload+=12;
         header.m_Frames[i].m_Payload+=12;
@@ -160,6 +181,8 @@ bool  filterFile          ( const char      * srcFileName,
                 !input.read((char*)&audio_data.m_SecondLang,1) ||
                 !input.read((char*)&audio_data.m_Payload,4) )
                 return false;
+
+        ChangeEndianness(audio_data.m_Payload,header.m_ID);
 
             if (audio_data.m_ID!=AUDIO_DATA_ID)
                 return false;
@@ -213,6 +236,10 @@ bool  filterFile          ( const char      * srcFileName,
 
 
     //-------------------------------------------------------------------------------------
+
+    ChangeEndianness(header.m_FrameCount,header.m_ID);
+    ChangeEndianness(header.m_Payload,header.m_ID);
+
     input.seekg(0,ios::beg);
     if (!output.write((char*)&header.m_ID,4) ||
         !output.write((char*)&header.m_FrameCount,4) ||
@@ -220,9 +247,13 @@ bool  filterFile          ( const char      * srcFileName,
         return false;
 
     input.seekg(12,ios::cur);
+    ChangeEndianness(header.m_FrameCount,header.m_ID);
 
     for ( uint32_t i=0 ; i<header.m_FrameCount ; i++)
     {
+        ChangeEndianness(header.m_Frames[i].m_Payload,header.m_ID);
+        ChangeEndianness(header.m_Frames[i].m_Video.m_Payload,header.m_ID);
+
         if( !output.write((char*)&header.m_Frames[i].m_ID,4) ||
             !output.write((char*)&header.m_Frames[i].m_Payload,4) ||
 
@@ -231,6 +262,7 @@ bool  filterFile          ( const char      * srcFileName,
             return false;
         input.seekg(16,ios::cur);
         //int var = input.tellg();
+        ChangeEndianness(header.m_Frames[i].m_Video.m_Payload,header.m_ID);
 
         for ( uint32_t j = 0 ; j<header.m_Frames[i].m_Video.m_Payload ; j++)
         {
@@ -251,6 +283,10 @@ bool  filterFile          ( const char      * srcFileName,
         else
             audio_files = 1;
 
+        ChangeEndianness(audio_files,header.m_ID);
+        ChangeEndianness(header.m_Frames[i].m_Audio.m_Payload,header.m_ID);
+
+
         if(!output.write((char*)&header.m_Frames[i].m_Audio.m_ID,4)||
             !output.write((char*)&audio_files,4)||
             !output.write((char*)&header.m_Frames[i].m_Audio.m_Payload,4))
@@ -268,6 +304,8 @@ bool  filterFile          ( const char      * srcFileName,
 
             if ( (audio_data.m_FirstLang == lang[0]) && (audio_data.m_SecondLang == lang[1] ) )
             {
+                //ChangeEndianness(audio_data.m_Payload,header.m_ID);
+                
                 if(!output.write((char*)&audio_data.m_ID,4)||
                 !output.write((char*)&audio_data.m_FirstLang,1)||
                 !output.write((char*)&audio_data.m_SecondLang,1)||
@@ -288,6 +326,7 @@ bool  filterFile          ( const char      * srcFileName,
             }
             else
             {
+                ChangeEndianness(audio_data.m_Payload,header.m_ID);
                 input.seekg((audio_data.m_Payload+4),ios::cur);
                 //var = input.tellg();
                 continue;
@@ -327,5 +366,20 @@ int main(void)
     assert (filterFile("in_0005.in","out_0005_cs_mine.out","cs"));
 
     assert (!filterFile("in_0006.in","out_0006_cs_mine.out","cs"));
+
+    assert (filterFile("big-endian/in_0000.in","big-endian/out_0000_cs_mine.out","cs"));
+
+    assert (filterFile("big-endian/in_0001.in","big-endian/out_0001_cs_mine.out","cs"));
+
+    assert (filterFile("big-endian/in_0002.in","big-endian/out_0002_en_mine.out","en"));
+
+    assert (filterFile("big-endian/in_0003.in","big-endian/out_0003_en_mine.out","en"));
+
+    assert (filterFile("big-endian/in_0004.in","big-endian/out_0004_pl_mine.out","pl"));
+
+    assert (filterFile("big-endian/in_0005.in","big-endian/out_0005_cs_mine.out","cs"));
+
+    assert (!filterFile("big-endian/in_0006.in","big-endian/out_0006_cs_mine.out","cs"));
+
 }
 #endif
