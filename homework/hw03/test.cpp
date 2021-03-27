@@ -42,7 +42,7 @@ class CPolynomial
         {
           for ( size_t i = second.m_Indeces.size() ; i < first.m_Indeces.size() ; i++)
           {
-            if (abs(first.m_Indeces[i]) < 0.1 )
+            if (abs(first.m_Indeces[i]) > 0.1 )
               return false;
           }
         }
@@ -50,7 +50,7 @@ class CPolynomial
         {
           for ( size_t i = first.m_Indeces.size() ; i < second.m_Indeces.size() ; i++)
           {
-            if (abs(second.m_Indeces[i]) < 0.1 )
+            if (abs(second.m_Indeces[i]) > 0.1 )
               return false;
           }
         }
@@ -69,7 +69,7 @@ class CPolynomial
     CPolynomial operator + (const CPolynomial & polyn ) const
     {
       CPolynomial NewIndeces;
-      NewIndeces.m_Indeces.reserve(max(this->m_Indeces.size(),polyn.m_Indeces.size()));
+      NewIndeces.m_Indeces.resize(max(this->m_Indeces.size(),polyn.m_Indeces.size()));
       for ( size_t i = 0 ; i < NewIndeces.m_Indeces.size() ; i++ )
         NewIndeces.m_Indeces[i] = 0;
       
@@ -88,7 +88,7 @@ class CPolynomial
     CPolynomial operator - (const CPolynomial & polyn) const 
     {
       CPolynomial NewIndeces;
-      NewIndeces.m_Indeces.reserve(max(this->m_Indeces.size(),polyn.m_Indeces.size()));
+      NewIndeces.m_Indeces.resize(max(this->m_Indeces.size(),polyn.m_Indeces.size()));
       for ( size_t i = 0 ; i < NewIndeces.m_Indeces.size() ; i++ )
         NewIndeces.m_Indeces[i] = 0;
       
@@ -107,7 +107,7 @@ class CPolynomial
     CPolynomial operator * (const CPolynomial & polyn) const
     {
       CPolynomial NewIndeces;
-      NewIndeces.m_Indeces.reserve(max(this->m_Indeces.size(),polyn.m_Indeces.size()));
+      NewIndeces.m_Indeces.resize(this->m_Indeces.size()+polyn.m_Indeces.size());
       for ( size_t i = 0 ; i < NewIndeces.m_Indeces.size() ; i++ )
         NewIndeces.m_Indeces[i] = 0;
       
@@ -115,7 +115,7 @@ class CPolynomial
       {
         for ( size_t j = 0 ; j < polyn.m_Indeces.size() ; j++ )
         {
-          NewIndeces.m_Indeces[i+j] = this->m_Indeces[i] * polyn.m_Indeces[j];
+          NewIndeces.m_Indeces[i+j] += this->m_Indeces[i] * polyn.m_Indeces[j];
         }
       }
       
@@ -149,14 +149,19 @@ class CPolynomial
       size_t old_size = this->m_Indeces.size()-1;
       if ( position > old_size )
       {
-        this->m_Indeces.resize(position);
-        for ( size_t i = old_size ; i < this->m_Indeces.size() ; i++ )
+        this->m_Indeces.resize(position+1);
+        for ( size_t i = old_size+1 ; i < this->m_Indeces.size() ; i++ )
           this->m_Indeces[i]=0;
       }
       return this->m_Indeces[position];
+    }
+
+    double operator [] (size_t position) const
+    {
+      return this->m_Indeces[position];
     } 
     // operator ()
-    double operator ()( int x ) const 
+    double operator ()( const int x ) const 
     {
       double result = 0;
       for ( size_t i = 0 ; i < this->m_Indeces.size() ; i++ )
@@ -166,18 +171,29 @@ class CPolynomial
       return result;
     }
     // Degree (), returns unsigned value
-    unsigned int Degree ( void )
+    unsigned int Degree ( void ) const
     {
-      size_t degree;
-      for ( size_t i = 0 ; i < this->m_Indeces[i] ; i++ )
-        if ( m_Indeces[i] > 0.1 )
+      size_t degree = 0;
+      for ( size_t i = 0 ; i < this->m_Indeces.size() ; i++ )
+      {
+        if ( abs(this->m_Indeces[i]) > 0.1 )
           degree = i;
-        
+      }
       return degree;
     }
     // << operator
     friend ostream &operator << ( ostream & out , const CPolynomial & Polyn )
     {
+      bool only_zeros= true;
+      for ( auto i : Polyn.m_Indeces )
+      {
+        if ( abs(i) >= 0.1 )
+        {
+          only_zeros = false;
+        }
+      }
+      if ( !only_zeros )
+      {
       bool first_index = true;
       for ( size_t i = Polyn.m_Indeces.size()-1 ; i > 0 ; i--)
       {
@@ -188,24 +204,52 @@ class CPolynomial
             if ( Polyn.m_Indeces[i] > 0 )
             {
               if ( Polyn.m_Indeces[i] == 1 )
-                out << "x^" << i << " ";
+                out << "x^" << i ;
               else
-                out << Polyn.m_Indeces[i] << "*x^" << i << " ";
+                out << Polyn.m_Indeces[i] << "*x^" << i ;
             }
             else 
             {
               if ( Polyn.m_Indeces[i] == -1 )
-                out << "- " << "x^" << i << " ";
+                out << "- " << "x^" << i ;
               else
-                out << "- " << -Polyn.m_Indeces[i] << "x^" << i << " ";
+                out << "- " << -Polyn.m_Indeces[i] << "*x^" << i ;
             }
+            first_index = false;
           }
           else
           {
-
+            if ( Polyn.m_Indeces[i] > 0 )
+            {
+              if ( Polyn.m_Indeces[i] == 1 )
+                out << " + x^" << i;
+              else
+                out << " + " << Polyn.m_Indeces[i] << "*x^" << i;
+            }
+            else 
+            {
+              if ( Polyn.m_Indeces[i] == -1 )
+                out << " - " << "x^" << i;
+              else
+                out << " - " << -Polyn.m_Indeces[i] << "*x^" << i;
+            }
           }
         }
       }
+      if ( abs(Polyn.m_Indeces[0]) > 0.1 )
+      {
+        if ( Polyn.m_Indeces[0] > 0 )
+        {
+          out << " + " << Polyn.m_Indeces[0];
+        }
+        else
+        {
+          out << " - " << -Polyn.m_Indeces[0];
+        }
+      }
+      }
+      else
+      out << 0;
       return out;
     }
   
