@@ -161,7 +161,7 @@ class CPolynomial
       return this->m_Indeces[position];
     } 
     // operator ()
-    double operator ()( const int x ) const 
+    double operator ()( const double x ) const 
     {
       double result = 0;
       for ( size_t i = 0 ; i < this->m_Indeces.size() ; i++ )
@@ -176,7 +176,7 @@ class CPolynomial
       size_t degree = 0;
       for ( size_t i = 0 ; i < this->m_Indeces.size() ; i++ )
       {
-        if ( abs(this->m_Indeces[i]) > 0.1 )
+        if ( abs(this->m_Indeces[i]) != 0 )
           degree = i;
       }
       return degree;
