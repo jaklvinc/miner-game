@@ -158,6 +158,7 @@ struct SOut
   {
     return m_Rec.size();
   }
+
   friend ostream & operator << ( ostream & os , const SOut & out )
   {
     for ( auto i : out.m_Rec )
@@ -230,7 +231,7 @@ class CZone
       return false;
     }
     // Search ()
-    SOut Search( const string & find )
+    SOut Search( const string & find ) const
     {
       SOut ret;
       for ( auto i : m_Rec )
