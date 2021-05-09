@@ -1,0 +1,26 @@
+K mé semestrální práci jsem si vybral zadání 2D snadbox hra. Budu implemntovat hru Miner. 
+
+Jedná se o klasický koncept. Hráč hraje za ztroskotaného astronauta, který potřebuje vytěžit určité materiály na postavení rakety. Bude si ale muset pomocí dalších materiálů vylepšit nástroje, aby byl schopen náročnější materiály vytěžit, nebo se k ním dostat. 
+
+Hráč bude mít vrták, kyslíkovou bombu a brnění. Tyto předměty půjdou všechny vylepšit. Vrták se bude požívat na těžení a souboj, bomba na dobu pod vodou a brnění na výdrž útoků. Pokud hráči dojde kyslík nebo životy, vrátí se zpět na povrch.
+
+Možnosti vytěžených materiálů budou korály, stříbro, železo, zlato, rubíny a kosti. Každý níž a níž pod povrchem a těžší dostat.
+Korály se budou samy náhodně obnovovat.
+
+Dále se pod hladinou budou nacházet nepřátelé.
+Mečouni, kteří budou bojovat klasicky kontakně a napadat hráče.
+Medůzy, které se budou pohybovat náhodně.
+Nafukovací ryby, které při napadení vybouchnou.
+Krabi, kteří budou lézt jen na blocích.
+Ječci, kteří budou na hráče střílet ostny.
+
+
+Dále budeme mít mapu, která bude ukazovat náš podvodní svět. Uvnitž vody budou jeskyně, ve ktrých se budou vyskytovat právě naši nepřátelé.
+
+Hra bude fungovat tahovým způsobem. Hráči se nebude odebírat kyslík podle času, ale spotřeby tahů. Například čím těžší bude vytěžit daný materiál, tím více kyslíku hráči ubyde.
+
+Jakmile hráč sesbírá dostatek surovin na postavení své rakety, hra skončí. Čím méně tahů, tím lépe. 
+
+Hru bude možné ukládat a zpětně nahrávat. Uložení bude brát v potaz pozici všech charakterů a jejich stav a také stav mapy. 
+
+
