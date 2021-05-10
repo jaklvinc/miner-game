@@ -47,8 +47,6 @@ class CPerson
   CPerson( int id , string name ):
   m_Name(name) , m_ID(id) 
   {
-    m_Mother = nullptr;
-    m_Father = nullptr;
   }
 
   int GetID ( void )
@@ -251,7 +249,7 @@ class CRegister
     list<pair<shared_ptr<CPerson>, ERel> > FindRelatives ( const int id1, const int id2 ) const
     {
       list<pair<shared_ptr<CPerson>,ERel>> relatives;
-      queue<shared_ptr<CPerson>> waiting;
+      /*queue<shared_ptr<CPerson>> waiting;
       map<int,shared_ptr<CPerson>> visited;
 
       shared_ptr<CPerson> firstPerson = FindByID(id1);
@@ -283,7 +281,7 @@ class CRegister
       while ( !waiting.empty() )
       {
 
-      }
+      }*/
       return relatives;
     }
 
