@@ -141,7 +141,7 @@ bool CExam::Load ( istream & cardMap )
       LoadedStudents.insert(itS,Student);
     }
   }
-  m_LoadedCards.merge(LoadedCards);
+  m_LoadedCards.insert(LoadedCards.begin(),LoadedCards.end());
   for ( auto i : LoadedStudents )
   {
     auto it = lower_bound(m_LoadedStudents.begin(),m_LoadedStudents.end(),i,cmpStudentID);
@@ -164,32 +164,43 @@ bool CExam::Register ( const string & cardID , const string & test)
     return false;
   }
   m_Tests[test].insert(itTest,itCards->second);
+  m_GradedStudents[test];
+  m_GradesByAddition[test];
+  m_GradesByGrade[test];
+  m_GradesByID[test];
+  m_GradesByName[test];
 
   return true;
 }
 
-void AddToMapList ( list<CResult> & List , const CResult & Grade , const char gl )
+void AddToMapList ( list<CResult> & List , const CResult & Grade, const char sort_by , const char gl )
 {
   bool set = false;
   for ( auto i = List.begin() ; i != List.end() ; i++ )
   {
-    if ( gl == 'g' )
+    if ( sort_by == 'g')
     {
       if ( Grade.m_Result > i->m_Result )
       {
         set = true;
-        List.insert(i,Grade);
-        break;
       }
-    }
-    else if ( gl == 'l' )
+    } else if ( sort_by == 'n' )
     {
-      if ( Grade.m_Result < i->m_Result )
+      if ( Grade.m_Name < i->m_Name )
       {
         set = true;
-        List.insert(i,Grade);
-        break;
       }
+    } else if ( sort_by == 'I' )
+    {
+      if ( Grade.m_StudentID < i->m_StudentID )
+      {
+        set = true;
+      }
+    }
+    if ( set )
+    {
+      List.insert(i,Grade);
+      return;
     }
   }
 
@@ -201,6 +212,9 @@ void AddToMapList ( list<CResult> & List , const CResult & Grade , const char gl
 
 bool CExam::Assess ( unsigned int studentID , const string & test , int result)
 {
+  if ( m_Tests.find(test) == m_Tests.end() )
+    return false;
+
   auto itTest = lower_bound(m_Tests[test].begin(),m_Tests[test].end(),studentID);
   if ( itTest == m_Tests[test].end() || *itTest != studentID )
   {
@@ -218,15 +232,18 @@ bool CExam::Assess ( unsigned int studentID , const string & test , int result)
   }
   m_GradesByAddition[test].push_back(Grade);
 
-  AddToMapList(m_GradesByGrade[test],Grade,'g');
-  AddToMapList(m_GradesByName[test],Grade,'l');
-  AddToMapList(m_GradesByID[test],Grade,'g');
+  AddToMapList(m_GradesByGrade[test],Grade,'g','g');
+  AddToMapList(m_GradesByName[test],Grade,'n','l');
+  AddToMapList(m_GradesByID[test],Grade,'I','g');
   m_GradedStudents[test].insert(studentID);
   return true;
 }
 
 list<CResult> CExam::ListTest ( const string & testName, int sortBy ) const
 {
+  list <CResult> List;
+  if ( m_GradesByAddition.find(testName) == m_GradesByAddition.end() )
+    return List;
   switch (sortBy)
   {
     case SORT_NONE: 
@@ -238,16 +255,19 @@ list<CResult> CExam::ListTest ( const string & testName, int sortBy ) const
     case SORT_NAME:
       return m_GradesByName.find(testName)->second;
     default:
-      return m_GradesByAddition.find(testName)->second;
+      return List;
   }
 }
 
 set<unsigned int> CExam::ListMissing ( const string & testName ) const
 {
   set<unsigned int> result;
+  if ( m_Tests.find(testName) == m_Tests.end() || m_GradedStudents.find(testName) == m_GradedStudents.end() )
+    return result;
+
   set_difference( m_Tests.find(testName)->second.begin() , m_Tests.find(testName)->second.end() , 
                   m_GradedStudents.find(testName)->second.begin() , m_GradedStudents.find(testName)->second.end(),
-                  inserter(result,result.end()) );
+                  std::inserter(result,result.end()) ); 
   return result;
 }
 
@@ -255,6 +275,47 @@ set<unsigned int> CExam::ListMissing ( const string & testName ) const
 #ifndef __PROGTEST__
 int main ( void )
 {
+  CExam mine;
+  istringstream ssmine;
+  ssmine.clear();
+  ssmine . str (  "0:A A:a, b, c, d\n"
+                  "1:A A:e, f\n"
+                  "2:B B:g, h\n"
+                  "3:B B:i\n"
+                  "4:E E:j\n"
+                  "5:F F:k\n");
+  assert ( mine.Load(ssmine) );
+  
+  assert ( mine . Register ( "a" , "T1" ) );
+  assert ( mine . Register ( "e" , "T1" ) );
+  assert ( mine . Register ( "g" , "T1" ) );
+  assert ( mine . Register ( "i" , "T1" ) );
+  assert ( mine . Register ( "j" , "T1" ) );
+  assert ( mine . Register ( "k" , "T1" ) );
+  assert ( !mine . Register ( "b" , "T1" ) );
+
+  assert ( mine.Assess( 0 , "T1" , 0 ) );
+  assert ( mine.Assess( 2 , "T1" , 50 ) );
+  assert ( mine.Assess( 3 , "T1" , 50 ) );
+  assert ( mine.Assess( 1 , "T1" , 100 ) );
+  assert ( mine.ListTest( "T1" , CExam::SORT_NONE ) == (list<CResult>
+  {
+    CResult ( "A A", 0, "T1", 0 ),
+    CResult ( "B B", 2, "T1", 50 ),
+    CResult ( "B B", 3, "T1", 50 ),
+    CResult ( "A A", 1, "T1", 100 )
+  } ) );
+  assert ( mine.ListTest( "T1" , CExam::SORT_NAME ) == (list<CResult>
+  {
+    CResult ( "A A", 0, "T1", 0 ),
+    CResult ( "A A", 1, "T1", 100 ),
+    CResult ( "B B", 2, "T1", 50 ),
+    CResult ( "B B", 3, "T1", 50 )
+  } ) );
+
+  assert ( mine.ListTest( "T3" , 5 ) == (list<CResult>
+  { } ) );
+
   istringstream iss;
   CExam         m;
   iss . clear ();

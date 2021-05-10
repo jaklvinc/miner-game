@@ -78,27 +78,41 @@ int findNumber( const CContact & Contact , const int PhoneNumber )
       return -1;
   }
 
-int findNumber( const CContact & Contact , const int PhoneNumber , const CTimeStamp & from )
+int findNumber( const CContact & Contact , const int PhoneNumber , CTimeStamp & from )
 {
   if ( Contact.getFirstPerson() == Contact.getSecondPerson())
       return -1;
     else if ( (Contact.getFirstPerson() == PhoneNumber) && 
               ( Contact.getTime().getTime() >= from.getTime() ) )
+    {
+      from = Contact.getTime();
       return Contact.getSecondPerson();
+    }
+      
     else if ( (Contact.getSecondPerson() == PhoneNumber) && 
               ( Contact.getTime().getTime() >= from.getTime() ) )
+    {
+      from = Contact.getTime();
       return Contact.getFirstPerson();
+    }
     else 
       return -1;
 }
 
-void CheckAndInsert ( vector<int> & Contacts , int save_num , deque<int> & to_search )
+int cmp ( pair<int,CTimeStamp> & Contact1 , pair<int,CTimeStamp> & Contact2 )
+{
+
+}
+
+void CheckAndInsert ( vector<pair<int,CTimeStamp>> & Contacts , int save_num , deque<pair<int,CTimeStamp>> & to_search ,CTimeStamp & time )
   {
     auto it = lower_bound(Contacts.begin(),Contacts.end(),save_num);
-    if ( it == Contacts.end() || *it != save_num )
+    if ( it != Contacts.end() && *it == save_num )
+      return;
+    else 
     {
       Contacts.insert(it,save_num);
-      to_search.push_back(save_num);
+      to_search.push_back(make_pair(save_num,time));
     }
       
     return;
@@ -137,22 +151,23 @@ class CEFaceMask
     // getInfectedGroup ( phone, timeStamp )
   vector<int> getInfectedGroup ( const int phone , const CTimeStamp & time  ) const
   {
-    vector<int> infected;
-    deque<int> to_search;
+    vector<pair<int,CTimeStamp>> infected;
+    deque<pair<int,CTimeStamp>> to_search;
 
-    to_search.push_back(phone);
-    infected.push_back(phone);
+    to_search.push_back(make_pair(phone,time));
+    infected.push_back(make_pair(phone,time));
 
     while ( ! to_search.empty() )
     {
-      int search = to_search.front();
+      int search = to_search.front().first;
+      CTimeStamp timestamp = to_search.front().second;
       to_search.pop_front();
 
       for ( auto Contact : m_Contacts )
       {
-        int save_num=findNumber(Contact,search,time);
+        int save_num=findNumber(Contact,search,timestamp);
         if ( save_num != -1 )
-          CheckAndInsert(infected,save_num,to_search);
+          CheckAndInsert(infected,save_num,to_search,timestamp);
       }
     }
 
