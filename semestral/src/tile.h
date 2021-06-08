@@ -1,42 +1,46 @@
-#pragma once 
+#pragma once
+#include <cstdlib>
+
+/* 
+    A = air
+    S = stone
+    C = coral
+    I = iron
+    G = gold
+    B = bone
+    D = Diamond
+*/
 
 class CTile
 {
-    protected:
-        char m_TileType;
-        bool m_IsSolid;
+protected:
+    char m_TileType;
+    int m_MineTime; // sets the energy used to mine certain Tile
 
-    public:
-        CTile();
-        CTile( char type , bool solid) : m_TileType(type), m_IsSolid(solid) {};
+public:
+    CTile(){};
+    CTile(  char type,
+            int MineTime) ;
 
-        virtual bool MoveInto( int DrillLvl ) = 0;
-        virtual bool MoveInto( void ) = 0; 
+    //getters for the member properties
+    const char &getType() const { return m_TileType; };
+    int getToughtness() const { return m_MineTime; };
 
+
+    void setType(char TileType) { m_TileType = TileType; };
 };
 
 
+class CStoneB : public CTile { public: CStoneB() : CTile('#', 2){}; };
 
-class CInteractable : public CTile
-{
-    protected:
-        int m_MineTime; // sets the energy used to mine certain Tile
+class CIronB : public CTile { public: CIronB() : CTile('i', 2){}; };
 
-    public:
-        //TODO: set minetime depending on Tile type
-        CInteractable():CTile(){};
-        CInteractable(char type, bool solid ):CTile(type,solid){};
+class CBoneB : public CTile { public: CBoneB() : CTile('b', 1){}; };
 
-        virtual bool MoveInto( int DrillLvl ) override ;//when a player moves into this 
-};
+class CGoldB : public CTile { public: CGoldB() : CTile('g', 3){}; };
 
+class CDiamondB : public CTile { public: CDiamondB() : CTile('d', 4){}; };
 
+class CCoralB : public CTile { public: CCoralB() : CTile('?', 1){}; };
 
-class CNonInteractable : public CTile
-{
-    public:
-    virtual bool MoveInto( void ) override ;
-
-    CNonInteractable():CTile(){};
-    CNonInteractable(char type, bool solid ):CTile(type,solid){};
-};
+class CAirB : public CTile { public: CAirB() : CTile('.', 1){}; };
