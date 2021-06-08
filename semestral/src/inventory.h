@@ -2,14 +2,29 @@
 
 #include <map>
 #include <string>
+#include "item.h"
+
+
 
 class CInventory
 {
-    private:
-        std::map<std::string,int> m_Inv;
-        int max_size;
+private:
+    int m_Inv[6];
+    int m_Prices[6];
+    int m_Weights[6];
+    int m_currentLoad;
+    int m_maxLoad;
+
+public:
+    CInventory();
+    void AddToInv(int type, int quantity);
+    bool InitInv(std::string filename, int backpackLvl);
+    bool SaveInv(std::string filename) const;
+    void Die();
+
+    int GetWeight( int type ) const;
+
+    void PrintLine( int type ) const;
+    void Print( ) const;
     
-    public:
-        void AddToInv( char Type, int Quantity );
-        bool InitInv ( std::string filename );
 };

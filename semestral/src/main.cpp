@@ -47,12 +47,19 @@ std::string Welcome( void )
         }
     }
 }
+void PrintDirections()
+{
+    std::cout<< std::endl;
+    std::cout<< "Press \'w,a,s,d\' to move." << std::endl;
+    std::cout<< "Press \'e\' to open inventory." << std::endl;
+}
 
 void Play( CMap & map, CPlayer & player )
 {
     bool breakOut = false;
     map.ShowMap( player.GetX() , player.GetY() , player.GetLight() );
     player.PrintStats();
+    PrintDirections();
     while(!breakOut)
     {
         char ch;
@@ -63,7 +70,11 @@ void Play( CMap & map, CPlayer & player )
         {
             moveCost=player.MoveCost(map,ch);
         }
-        else 
+        else if ( ch == 'e' )
+        {
+            player.GetInv().Print();
+        }
+        else
         {
             break;
         }
@@ -73,6 +84,7 @@ void Play( CMap & map, CPlayer & player )
             player.OxDown(5);
             map.ShowMap( player.GetX() , player.GetY() , player.GetLight() );
             player.PrintStats();
+            PrintDirections();
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
         player.Move(map,ch);
@@ -84,6 +96,7 @@ void Play( CMap & map, CPlayer & player )
         player.Mine(map);
         map.ShowMap( player.GetX() , player.GetY() , player.GetLight() );
         player.PrintStats();
+        PrintDirections();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }

@@ -6,7 +6,7 @@ FLAGS = -std=c++17 -pedantic -Wall -fsanitize=address -g
 
 all: game
 
-game: main.o map.o entity.o inventory.o tile.o player.o
+game: main.o map.o entity.o inventory.o tile.o item.o player.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp

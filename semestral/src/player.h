@@ -24,6 +24,7 @@ class CPlayer: public CEntity
         bool Save( std::string filename );
 
         int GetLight();
+        CInventory & GetInv ();
 
         void Move( const  CMap & map , const char direction ) override;
         int MoveCost ( const CMap & map , const char direction ) const;

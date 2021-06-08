@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "enum.h"
 
 CPlayer::CPlayer ( int x , int y ) : CEntity(x,y)
 {
@@ -40,7 +41,7 @@ std::pair<int,int> CPlayer::NewPos( const char dir , const int width , const int
 
 bool CPlayer::Load ( std::string filename )
 {
-    //checks if some save file exists
+
     std::ifstream data;
     data.open(filename);
     if (data.is_open())
@@ -72,6 +73,10 @@ bool CPlayer::Load ( std::string filename )
             return false;
         }
         m_MaxHealth = 150 * m_LvlTank;
+
+        if ( !m_Inv.InitInv(filename,m_LvlBackpack) )
+            return false;
+
         return true;
     }
     else
@@ -86,7 +91,13 @@ bool CPlayer::Save ( std::string filename)
     {
         data << m_PosX << ' ' << m_PosY << ' ' << std::endl;
         data << m_LvlLight << ' ' << m_LvlTank << ' ' << m_LvlDrill << ' ' << m_LvlBackpack << ' ' << m_Money << std::endl;
-        data << m_Health << std::endl << std::endl ;
+        data << m_Health << std::endl;
+        
+        data.close();
+        if ( !m_Inv.SaveInv( filename ) )
+        {
+            return false;
+        }
         return true;
     }
     return false;
@@ -95,6 +106,11 @@ bool CPlayer::Save ( std::string filename)
 int CPlayer::GetLight ()
 {
     return m_LvlLight;
+}
+
+CInventory & CPlayer::GetInv ()
+{
+    return m_Inv;
 }
 
 void CPlayer::Move ( const CMap & map , char dir )
@@ -123,15 +139,6 @@ void CPlayer::Mine( CMap & map )
     return;
 }
 
-void CPlayer::PrintStats() const
-{
-    std::cout << "\033[31m" << "OXYGEN: " << m_Health << "\033[34m" << 
-        " | LIGHT LVL: " << m_LvlLight << 
-        " |  OXYGEN TANK LVL: " << m_LvlTank << 
-        " |  DRILL LVL: " << m_LvlDrill << 
-        " |  BACKPACK LVL: " << m_LvlBackpack << "\033[0m" << std::endl;
-}
-
 void CPlayer::OxDown( int amount )
 {
     m_Health-=amount;
@@ -151,5 +158,15 @@ void CPlayer::Die()
 {
     m_PosY = 0;
     OxReset();
+    m_Inv.Die();
+}
+
+void CPlayer::PrintStats() const
+{
+    std::cout << "\033[31m" << "OXYGEN: " << m_Health << "\033[34m" << 
+        " | LIGHT LVL: " << m_LvlLight << 
+        " |  OXYGEN TANK LVL: " << m_LvlTank << 
+        " |  DRILL LVL: " << m_LvlDrill << 
+        " |  BACKPACK LVL: " << m_LvlBackpack << "\033[0m" << std::endl;
 }
 
