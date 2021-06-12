@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include "enum.h"
 
-
 CMap::CMap()
 {
     m_Height = 0;
@@ -52,7 +51,7 @@ bool CMap::Save(std::string filename)
             for (int x = 0; x < m_Width; x++)
             {
                 int type = m_Map[y][x]->getType();
-                if ( type < 10 )
+                if (type < 10)
                     data << type;
                 else
                     data << '.';
@@ -193,10 +192,10 @@ void CMap::ShowMap(int playerX, int playerY, int lightLvl)
                     std::cout << "\033[36m"
                               << "▓"
                               << "\033[0m";
-                
+
                 else if (type == BONE)
                     std::cout << "▒";
-                
+
                 else
                     std::cout << type;
             }

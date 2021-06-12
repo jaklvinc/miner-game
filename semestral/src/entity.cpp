@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 
-CEntity::CEntity( int x, int y): m_PosX (x) , m_PosY (y) {}
+CEntity::CEntity(int x, int y) : m_PosX(x), m_PosY(y) {}
 
 int CEntity::GetX()
 {
@@ -14,4 +14,3 @@ int CEntity::GetY()
 {
     return m_PosY;
 }
-

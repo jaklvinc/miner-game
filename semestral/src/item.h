@@ -13,7 +13,7 @@ public:
     char GetType() const;
     int GetWeight() const;
 
-    bool operator < ( const CItem & item ) const;
-    bool operator < ( const char & type ) const;
-    bool operator == ( const char & type ) const;
+    bool operator<(const CItem &item) const;
+    bool operator<(const char &type) const;
+    bool operator==(const char &type) const;
 };

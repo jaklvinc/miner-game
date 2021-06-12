@@ -5,5 +5,6 @@ enum
     STONE,
     IRON,
     GOLD,
-    DIAMOND
+    DIAMOND,
+    SIZE
 };

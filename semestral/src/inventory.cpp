@@ -30,46 +30,46 @@ bool CInventory::InitInv(std::string filename, int BackpackLvl)
         if (boneCnt < 0 || coralCnt < 0 || stoneCnt < 0 || ironCnt < 0 || goldCnt < 0 || diamondCnt < 0)
             return false;
 
-        m_Inv[BONE]=boneCnt;
-        m_Inv[CORAL]=coralCnt;
-        m_Inv[STONE]=stoneCnt;
-        m_Inv[IRON]=ironCnt;
-        m_Inv[GOLD]=goldCnt;
-        m_Inv[DIAMOND]=diamondCnt;
+        m_Inv[BONE] = boneCnt;
+        m_Inv[CORAL] = coralCnt;
+        m_Inv[STONE] = stoneCnt;
+        m_Inv[IRON] = ironCnt;
+        m_Inv[GOLD] = goldCnt;
+        m_Inv[DIAMOND] = diamondCnt;
 
-        m_Weights[BONE]=25;
-        m_Weights[CORAL]=5;
-        m_Weights[STONE]=10;
-        m_Weights[IRON]=10;
-        m_Weights[GOLD]=15;
-        m_Weights[DIAMOND]=5;
+        m_Weights[BONE] = 25;
+        m_Weights[CORAL] = 5;
+        m_Weights[STONE] = 10;
+        m_Weights[IRON] = 10;
+        m_Weights[GOLD] = 15;
+        m_Weights[DIAMOND] = 5;
 
-        m_Prices[BONE]=50;
-        m_Prices[CORAL]=200;
-        m_Prices[STONE]=50;
-        m_Prices[IRON]=500;
-        m_Prices[GOLD]=1000;
-        m_Prices[BONE]=2000;
+        m_Prices[BONE] = 50;
+        m_Prices[CORAL] = 100;
+        m_Prices[STONE] = 20;
+        m_Prices[IRON] = 200;
+        m_Prices[GOLD] = 500;
+        m_Prices[DIAMOND] = 5000;
 
-        m_currentLoad+= boneCnt*m_Weights[BONE] + coralCnt*m_Weights[CORAL] + stoneCnt*m_Weights[STONE] +
-                        ironCnt*m_Weights[IRON] + goldCnt*m_Weights[GOLD] + diamondCnt*m_Weights[DIAMOND];
-        if ( m_currentLoad > m_maxLoad )
+        m_currentLoad += boneCnt * m_Weights[BONE] + coralCnt * m_Weights[CORAL] + stoneCnt * m_Weights[STONE] +
+                         ironCnt * m_Weights[IRON] + goldCnt * m_Weights[GOLD] + diamondCnt * m_Weights[DIAMOND];
+        if (m_currentLoad > m_maxLoad)
             return false;
-        
+
         return true;
     }
     else
         return false;
 }
 
-bool CInventory::SaveInv( std::string filename ) const
+bool CInventory::SaveInv(std::string filename) const
 {
-    
+
     std::ofstream data;
     data.open(filename, std::ios_base::app);
     if (data.is_open())
     {
-        data << m_Inv[BONE] << ' ' << m_Inv[CORAL] << ' ' << m_Inv[STONE] << ' ' << m_Inv[IRON] <<  ' ' << m_Inv[GOLD] <<  ' ' << m_Inv[DIAMOND] << std::endl;
+        data << m_Inv[BONE] << ' ' << m_Inv[CORAL] << ' ' << m_Inv[STONE] << ' ' << m_Inv[IRON] << ' ' << m_Inv[GOLD] << ' ' << m_Inv[DIAMOND] << std::endl;
         data << std::endl;
         return true;
     }
@@ -78,78 +78,179 @@ bool CInventory::SaveInv( std::string filename ) const
 
 void CInventory::AddToInv(int type, int quantity)
 {
-    for( int i = 0; i< quantity ; i++ )
+    for (int i = 0; i < quantity; i++)
     {
-        if ( m_currentLoad + m_Weights[type] > m_maxLoad )
+        if (m_currentLoad + m_Weights[type] > m_maxLoad)
         {
             return;
         }
         else
         {
             m_Inv[type]++;
-            m_maxLoad += m_Weights[type];
+            m_currentLoad += m_Weights[type];
         }
     }
+    std::cout << "+ " << quantity << " ";
+    if (type == BONE)
+        std::cout << "BONE";
+    else if (type == CORAL)
+        std::cout << "CORAL";
+    else if (type == STONE)
+        std::cout << "STONE";
+    else if (type == IRON)
+        std::cout << "IRON";
+    else if (type == GOLD)
+        std::cout << "GOLD";
+    else if (type == DIAMOND)
+        std::cout << "DIAMOND";
+
+    std::cout << std::endl;
     return;
 }
 
-int CInventory::GetWeight( int type ) const
+int CInventory::GetWeight(int type) const
 {
     return m_Weights[type];
 }
 
-void CInventory::PrintLine( int type ) const
+int CInventory::GetPrice(int type) const
 {
-    std::cout<< "    ";
-    std::cout<< m_Weights[type];
-    for ( size_t i = 0 ; i < 19-std::to_string( m_Weights[type] ).length() ; i++ )
+    return m_Prices[type];
+}
+
+int CInventory::GetQuantity(int type) const
+{
+    return m_Inv[type];
+}
+
+void CInventory::PrintLine(int type) const
+{
+    std::cout << "    ";
+    std::cout << m_Weights[type];
+    for (size_t i = 0; i < 19 - std::to_string(m_Weights[type]).length(); i++)
         std::cout << ' ';
-    
+
     std::cout << "│   ";
     std::cout << m_Inv[type];
-    for ( size_t i = 0 ; i < 15-std::to_string( m_Inv[type] ).length() ; i++ )
+    for (size_t i = 0; i < 15 - std::to_string(m_Inv[type]).length(); i++)
         std::cout << ' ';
-    
+
     std::cout << "│      ";
     std::cout << m_Inv[type] * m_Weights[type];
-    for ( size_t i = 0 ; i < 19-std::to_string( m_Inv[type] * m_Weights[type] ).length() ; i++ )
+    for (size_t i = 0; i < 19 - std::to_string(m_Inv[type] * m_Weights[type]).length(); i++)
         std::cout << ' ';
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << std::endl;
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m" << std::endl;
     return;
 }
 
-void CInventory::Print(  ) const
+int CInventory::GetSize() const
 {
-    std::cout << std::string(30,'\n');
-    std::cout << "\033[34m" << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << "\033[0m" << std::endl;
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "    ITEM TYPE    │    WEIGHT PER ITEM    │   IN INVENTORY   │      TOTAL WEIGHT       " << "\033[34m" <<"@"<< "\033[0m" << std::endl;
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "─────────────────┼───────────────────────┼──────────────────┼─────────────────────────" << "\033[34m" <<"@"<< "\033[0m" << std::endl;
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "    BONE         │";
+    return m_maxLoad;
+}
+
+int CInventory::GetLoad() const
+{
+    return m_currentLoad;
+}
+
+void CInventory::Print() const
+{
+    std::cout << std::string(100, '\n');
+    std::cout << "\033[34m"
+              << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+              << "\033[0m" << std::endl;
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "    ITEM TYPE    │    WEIGHT PER ITEM    │   IN INVENTORY   │      TOTAL WEIGHT       "
+              << "\033[34m"
+              << "@"
+              << "\033[0m" << std::endl;
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "─────────────────┼───────────────────────┼──────────────────┼─────────────────────────"
+              << "\033[34m"
+              << "@"
+              << "\033[0m" << std::endl;
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "    BONE         │";
     PrintLine(BONE);
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "    CORAL        │";
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "    CORAL        │";
     PrintLine(CORAL);
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "    STONE        │";
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "    STONE        │";
     PrintLine(STONE);
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "    IRON         │";
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "    IRON         │";
     PrintLine(IRON);
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "    GOLD         │";
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "    GOLD         │";
     PrintLine(GOLD);
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "    DIAMOND      │";
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "    DIAMOND      │";
     PrintLine(DIAMOND);
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << "─────────────────┴───────────────────────┴──────────────────┴─────────────────────────" << "\033[34m" <<"@"<< "\033[0m" << std::endl;
-    std::cout << "\033[34m" <<"@"<<"\033[31m" << "  TOTAL CAPACITY                                                   " << m_currentLoad << "/" << m_maxLoad<< "\033[34m";
-    for ( size_t i = 0 ; i < 19-std::to_string( m_currentLoad ).length()-std::to_string( m_maxLoad ).length()-1 ; i++ )
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m"
+              << "─────────────────┴───────────────────────┴──────────────────┴─────────────────────────"
+              << "\033[34m"
+              << "@"
+              << "\033[0m" << std::endl;
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[31m"
+              << "  TOTAL CAPACITY                                                   " << m_currentLoad << "/" << m_maxLoad << "\033[34m";
+    for (size_t i = 0; i < 19 - std::to_string(m_currentLoad).length() - std::to_string(m_maxLoad).length() - 1; i++)
         std::cout << ' ';
-    std::cout << "\033[34m" <<"@"<< "\033[0m" << std::endl;
-    std::cout << "\033[34m" <<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << "\033[0m" << std::endl;
-    std::cout << "Press any button to leave the inventory."; 
-    std::cout << std::endl;
-    char doesntMatter;
-    std::cin >> doesntMatter;
+    std::cout << "\033[34m"
+              << "@"
+              << "\033[0m" << std::endl;
+    std::cout << "\033[34m"
+              << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+              << "\033[0m" << std::endl;
     return;
+}
+
+void CInventory::PrintCapacity() const
+{
+    std::cout << "\033[33m"
+              << "INVENTORY CAPACITY: " << m_currentLoad << "/" << m_maxLoad << "\033[0m" << std::endl;
 }
 
 void CInventory::Die()
 {
-    
+    int newCurLoad = 0;
+    for (int i = 0; i < SIZE; i++)
+    {
+        int newNumber = m_Inv[i] / 2;
+        m_Inv[i] = newNumber;
+        newCurLoad += m_Inv[i] * m_Weights[i];
+    }
+    m_currentLoad = newCurLoad;
+    return;
+}
+
+void CInventory::Reset()
+{
+    m_currentLoad = 0;
+    for (int i = 0; i < SIZE; i++)
+    {
+        m_Inv[i] = 0;
+    }
 }
