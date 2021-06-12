@@ -212,3 +212,22 @@ void CMap::ShowMap(int playerX, int playerY, int lightLvl)
     }
     return;
 }
+
+void CMap::Regenerate()
+{
+    for (int y = 1; y < m_Height-1; y++)
+    {
+        for (int x = 0; x < m_Width; x++)
+        {
+            if ( m_Map[y][x]->getType()=='.' && m_Map[y+1][x]->getType()!=CORAL && m_Map[y+1][x]->getType()!='.' )
+            {
+                int random = rand() % 100;
+                if ( random <= 1 )
+                {
+                    auto coral = std::make_shared<CCoralB>();
+                    m_Map[y][x] = coral;
+                }
+            }
+        }
+    }
+}

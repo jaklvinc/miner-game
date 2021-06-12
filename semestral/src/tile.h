@@ -15,7 +15,6 @@ class CTile
 protected:
     int m_TileType;
     int m_MineTime; // sets the energy used to mine certain Tile
-
 public:
     CTile(){};
     CTile(int type,
@@ -24,8 +23,6 @@ public:
     //getters for the member properties
     int getType() const { return m_TileType; };
     int getToughtness() const { return m_MineTime; };
-
-    void setType(char TileType) { m_TileType = TileType; };
 };
 
 class CStoneB : public CTile

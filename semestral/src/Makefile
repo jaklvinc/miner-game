@@ -1,12 +1,12 @@
 LD = 	g++
 CXX = 	g++
-LDFLAGS = -fsanitize=address -lncurses
+LDFLAGS = -fsanitize=address
 FLAGS = -std=c++17 -pedantic -Wall -fsanitize=address -g 
 
 
-all: game
+all: miner
 
-game: main.o map.o entity.o inventory.o tile.o item.o player.o
+miner: main.o map.o inventory.o tile.o item.o player.o game.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp

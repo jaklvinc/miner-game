@@ -1,12 +1,17 @@
 #pragma once
 
 #include "inventory.h"
-#include "entity.h"
+#include "map.h"
 #include <string>
 
-class CPlayer : public CEntity
+class CPlayer
 {
 protected:
+    int m_PosX;
+    int m_PosY;
+    int m_MaxHealth;
+    int m_Health;
+
     CInventory m_Inv;
     int m_LvlLight;
     int m_LvlTank;
@@ -19,16 +24,18 @@ protected:
     void PrintShop() const;
 
 public:
-    CPlayer() : CEntity(){};
+    CPlayer(){};
     CPlayer(int x, int y);
 
     bool Load(std::string filename);
     bool Save(std::string filename);
 
-    int GetLight();
+    int GetLight() const;
     CInventory &GetInv();
+    int GetX() const;
+    int GetY() const;
 
-    void Move(const CMap &map, const char direction) override;
+    void Move(const CMap &map, const char direction);
     int MoveCost(const CMap &map, const char direction) const;
     void Mine(CMap &map);
     void OxDown(const int amount);

@@ -4,9 +4,18 @@
 #include <iostream>
 #include "enum.h"
 
-CPlayer::CPlayer(int x, int y) : CEntity(x, y)
+CPlayer::CPlayer(int x, int y) : m_PosX(x) , m_PosY(y)
 {
-    //m_Inv.InitInv();
+}
+
+int CPlayer::GetX() const
+{
+    return m_PosX;
+}
+
+int CPlayer::GetY() const
+{
+    return m_PosY;
 }
 
 std::pair<int, int> CPlayer::NewPos(const char dir, const int width, const int height) const
@@ -103,7 +112,7 @@ bool CPlayer::Save(std::string filename)
     return false;
 }
 
-int CPlayer::GetLight()
+int CPlayer::GetLight() const
 {
     return m_LvlLight;
 }
@@ -132,7 +141,7 @@ int CPlayer::MoveCost(const CMap &map, char dir) const
         return map.GetOnIndex(new_pos.first, new_pos.second)->getToughtness();
 }
 
-void CPlayer::Mine(CMap &map)
+void CPlayer::Mine(CMap & map)
 {
     auto new_tile = std::make_shared<CAirB>();
     std::shared_ptr<CTile> tile = map.GetOnIndex(m_PosX, m_PosY);
