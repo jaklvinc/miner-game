@@ -17,7 +17,7 @@ public:
 
     bool Save(std::string filename); // saves a map to a file
 
-    void ShowMap(int playerX, int playerY, int lightLvl);
+    void ShowMap(std::vector<std::vector<char>> & toPrint);
 
     void Regenerate();
 

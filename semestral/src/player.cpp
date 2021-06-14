@@ -61,7 +61,7 @@ bool CPlayer::Load(std::string filename)
 
         ss >> m_PosX >> m_PosY;
 
-        if (m_PosY < 0 || m_PosY < 0)
+        if (m_PosX < 0 || m_PosY < 0)
         {
             return false;
         }
@@ -224,6 +224,11 @@ bool CPlayer::UpgradeEquipent(int type)
             return false;
     }
     return true;
+}
+
+void CPlayer::ShowPos(std::vector<std::vector<char>> & toPrint)
+{
+    toPrint[m_PosY][m_PosX]='P';
 }
 
 void CPlayer::PrintStats() const

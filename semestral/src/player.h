@@ -43,6 +43,7 @@ public:
     void Die();
     bool UpgradeEquipent(int type);
 
+    void ShowPos(std::vector<std::vector<char>> & toPrint);
     void PrintStats() const;
     void PrintInvCapacity() const;
     void Inventory();
