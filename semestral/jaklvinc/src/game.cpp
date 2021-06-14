@@ -1,5 +1,6 @@
 
 #include "game.h"
+#include "enum.h"
 #include <iostream>
 #include <fstream>
 #include <experimental/filesystem>
@@ -225,28 +226,28 @@ void CGame::PrintMap() const
                 if (type == '.')
                     std::cout<<' ';
                 
-                else if ( type == 's' )
+                else if ( type == STONE )
                     std::cout << "▓";
                 
-                else if ( type == 'i' )
+                else if ( type == IRON )
                     std::cout << "\033[31m"
                               << "▓"
                               << "\033[0m";
                 
-                else if ( type == 'g')
+                else if ( type == GOLD)
                     std::cout << "\033[33m"
                               << "▓"
                               << "\033[0m";
                 
-                else if ( type == 'd' )
+                else if ( type == DIAMOND )
                     std::cout << "\033[36m"
                               << "▓"
                               << "\033[0m";
 
-                else if ( type == 'b' )
+                else if ( type == BONE )
                     std::cout << "▒";
 
-                else if ( type == 'c' )
+                else if ( type == CORAL )
                     std::cout << "\033[32m" << '?' << "\033[0m";
                 
                 else if ( type == 'B' )

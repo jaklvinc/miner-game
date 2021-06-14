@@ -30,3 +30,5 @@ Jakmile hráč vylepší všechny své itemy na nejvyšší level, a sesbírá n
 Hru bude možné ukládat a zpětně nahrávat. Uložení bude brát v potaz pozici všech entit a jejich stav a také stav hráče a mapy.
 
 
+Polymorfismus je implementován v třídě entity a jejích podtřídách. Třída entityHandler ukládá shared_pointery na entities.
+Při volání Move se zavolá na všechny entities bez ohledu na to o jakou podtřídu se jedná. To samé platí pro Attack a Save.

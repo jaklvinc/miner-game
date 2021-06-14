@@ -1,11 +1,10 @@
 #include "tile.h"
 #include "enum.h"
 
-CTile::CTile(int type,
-             int MineTime)
+CTile::CTile(int type, int mineTime)
 {
     m_TileType = type;
-    m_MineTime = MineTime;
+    m_MineTime = mineTime;
 }
 
 int CTile::GetType() const 

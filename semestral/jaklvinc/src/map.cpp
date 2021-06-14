@@ -160,29 +160,7 @@ void CMap::ShowMap(std::vector<std::vector<char>> & toPrint) const
         for (int x = 0; x < m_Width; x++)
         {
             int type = m_Map[y][x].GetType();
-            if (type == '.')
-                toPrint[y][x]='.';
-
-            else if (type == STONE)
-                toPrint[y][x]='s';
-
-            else if (type == IRON)
-                toPrint[y][x]='i';
-
-            else if (type == GOLD)
-                toPrint[y][x]='g';
-
-            else if (type == CORAL)
-                toPrint[y][x]='c';
-
-            else if (type == DIAMOND)
-                toPrint[y][x]='d';
-
-            else if (type == BONE)
-                toPrint[y][x]='b';
-
-            else 
-                toPrint[y][x]='.';
+            toPrint[y][x]=type;
         }
         toPrint.push_back(rowTmp);
     }
