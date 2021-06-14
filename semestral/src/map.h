@@ -11,6 +11,11 @@
  */
 class CMap
 {
+private:
+    int m_Height;
+    int m_Width;
+    std::vector<std::vector<CTile>> m_Map;
+    
 public:
     /**
      * Default constructor
@@ -81,8 +86,5 @@ public:
      */
     int GetHeight() const;
 
-private:
-    int m_Height;
-    int m_Width;
-    std::vector<std::vector<CTile>> m_Map;
+
 };

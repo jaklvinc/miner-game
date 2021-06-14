@@ -1,10 +1,9 @@
 #pragma once
 
-#include "player.h"
 #include "entityHandler.h"
 #include <queue>
 /**
- * Wrapper class the whole game.
+ * Wrapper class for the whole game.
  */
 class CGame
 {
@@ -12,6 +11,8 @@ class CGame
         CMap m_Map;
         CPlayer m_Player;
         CEntityHandler m_Entities;
+
+        /** Stores if win condition is met */
         bool m_Win;
 
         /**

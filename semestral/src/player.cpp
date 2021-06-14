@@ -310,7 +310,7 @@ bool CPlayer::UpgradeEquipment(int type)
 {
     if (type == 1)
     {
-        if (m_Money >= m_LvlLight * 5000)
+        if (m_Money >= m_LvlLight * 5000 && m_LvlLight < 4)
         {
             m_Money -= m_LvlLight * 5000;
             m_LvlLight++;
@@ -320,7 +320,7 @@ bool CPlayer::UpgradeEquipment(int type)
     }
     else if (type == 2)
     {
-        if (m_Money >= m_LvlTank * 5000)
+        if (m_Money >= m_LvlTank * 5000 && m_LvlTank < 4 )
         {
             m_Money -= m_LvlTank * 5000;
             m_LvlTank++;
@@ -330,7 +330,7 @@ bool CPlayer::UpgradeEquipment(int type)
     }
     else if (type == 3)
     {
-        if (m_Money >= m_LvlDrill * 5000)
+        if (m_Money >= m_LvlDrill * 5000 && m_LvlDrill < 4)
         {
             m_Money -= m_LvlDrill * 5000;
             m_LvlDrill++;
@@ -340,7 +340,7 @@ bool CPlayer::UpgradeEquipment(int type)
     }
     else if (type == 4)
     {
-        if (m_Money >= m_LvlBackpack * 5000)
+        if (m_Money >= m_LvlBackpack * 5000 && m_LvlBackpack < 4)
         {
             m_Money -= m_LvlBackpack * 5000;
             m_LvlBackpack++;
@@ -433,7 +433,7 @@ void CPlayer::Shop()
             this->PrintShop();
             std::cout << "\033[32m"
                       << "MONEY: " << m_Money << "\033[0m" << std::endl;
-            std::cout << "Unsufficient balance" << std::endl;
+            std::cout << "Unsufficient balance or equipment already max lvl" << std::endl;
         }
     }
     return;

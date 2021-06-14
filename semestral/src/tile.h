@@ -9,6 +9,8 @@ class CTile
 {
 protected:
     int m_TileType;
+    
+    /** Stores how many turns it takes to mine this tile */
     int m_MineTime;
 public:
     /**

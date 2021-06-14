@@ -9,10 +9,15 @@
 class CInventory
 {
 private:
+    /** Stores number of each item in possesion */
     int m_Inv[6];
     int m_Prices[6];
     int m_Weights[6];
+
+    /** Stores current fullness of inventory */
     int m_currentLoad;
+    
+    /** Stores max size of inventory*/
     int m_maxLoad;
 
     /**

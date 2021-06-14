@@ -1,3 +1,6 @@
+/**
+ * Stores values for accessing inventory arrays
+ */
 enum
 {
     BONE,

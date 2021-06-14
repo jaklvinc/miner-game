@@ -18,19 +18,19 @@ std::string CGame::getFileName(const std::string &filePath)
 
 bool CGame::LoadGame(std::string &file)
 {
-    if (std::filesystem::is_empty("../examples/saves"))
+    if (std::filesystem::is_empty("examples/saves"))
     {
         return false;
     }
     while (true)
     {
         std::cout << "Your saves:" << std::endl;
-        for (const auto &files : std::filesystem::directory_iterator("../examples/saves"))
+        for (const auto &files : std::filesystem::directory_iterator("examples/saves"))
         {
             std::cout << getFileName(files.path()) << std::endl;
         }
         std::cout << "──────────────────────────" << std::endl;
-        file = "../examples/saves/";
+        file = "examples/saves/";
         std::string fileName;
         std::cin >> fileName;
         file.append(fileName);
@@ -109,17 +109,17 @@ bool CGame::StartGame()
     {
         if (input == '1')
         {
-            if (!m_Map.Load("../examples/new_game/ng"))
+            if (!m_Map.Load("examples/new_game/ng.txt"))
             {
                 std::cout << "Map couldn't be loaded, your save may be corrupted, or it doesn't exist." << std::endl;
                 return false;
             }
-            if (!m_Player.Load("../examples/new_game/ng",m_Map))
+            if (!m_Player.Load("examples/new_game/ng.txt",m_Map))
             {
                 std::cout << "Player data couldn't be loaded, your save may be corrupted, or it doesn't exist." << std::endl;
                 return false;
             }
-            if ( !m_Entities.LoadEntities("../examples/new_game/ng",m_Map) )
+            if ( !m_Entities.LoadEntities("examples/new_game/ng.txt",m_Map) )
             {
                 std::cout << "Entity data couldn't be loaded, your save may be corrupted." << std::endl;
                 return false;
@@ -166,7 +166,7 @@ void CGame::SaveAndQuit()
 {
     std::cout << std::string(100, '\n');
     std::cout << "Your saves:" << std::endl;
-    for (const auto &files : std::filesystem::directory_iterator("../examples/saves"))
+    for (const auto &files : std::filesystem::directory_iterator("examples/saves"))
     {
         std::cout << getFileName(files.path()) << std::endl;
     }
@@ -175,7 +175,7 @@ void CGame::SaveAndQuit()
     std::string outFilename;
     std::cin >> outFilename;
 
-    outFilename = "../examples/saves/" + outFilename;
+    outFilename = "examples/saves/" + outFilename;
     if (!m_Player.Save(outFilename))
     {
         std::cout << "Your player stats couldn't be saved." << std::endl;
@@ -204,7 +204,8 @@ void CGame::ClearScreen() const
 
 void CGame::PrintMap() const
 {
-    std::vector<std::vector<char>> toPrint;
+    
+    std::vector<std::vector<char>> toPrint( m_Map.GetHeight() , std::vector<char>( m_Map.GetWidth() , '.' ) );
     m_Map.ShowMap(toPrint);
     m_Entities.ShowEntities(toPrint);
     m_Player.ShowPos(toPrint);
@@ -283,7 +284,6 @@ void CGame::PrintMap() const
 
 void CGame::Play()
 {
-    bool breakOut = false;
     if (m_Player.GetY() == 0)
         m_Player.OxReset();
     
@@ -292,11 +292,10 @@ void CGame::Play()
     m_Player.PrintInvCapacity();
     PrintMap();
     PrintDirections();
-    while (!breakOut)
+    char ch = '0';
+    while (std::cin >> ch)
     {
         bool unknownCmd = false;
-        char ch = '0';
-        std::cin >> ch;
 
         int moveCost = 0;
         if (ch == 'w' || ch == 's' || ch == 'a' || ch == 'd')

@@ -5,8 +5,13 @@
 class CFairy: public CEntity
 {
 private:
+    /** How many double turns until the fairy can move*/
     int m_Cooldown;
+
+    /** Stores if the fairy can be seen an heal now */
     bool m_Active;
+
+    /** Stores if the fairy is moving this turn */
     int m_Move;
 public:
     /**

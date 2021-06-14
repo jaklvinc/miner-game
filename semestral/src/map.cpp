@@ -161,28 +161,28 @@ void CMap::ShowMap(std::vector<std::vector<char>> & toPrint) const
         {
             int type = m_Map[y][x].GetType();
             if (type == '.')
-                rowTmp.push_back('.');
+                toPrint[y][x]='.';
 
             else if (type == STONE)
-                rowTmp.push_back('s');
+                toPrint[y][x]='s';
 
             else if (type == IRON)
-                rowTmp.push_back('i');
+                toPrint[y][x]='i';
 
             else if (type == GOLD)
-                rowTmp.push_back('g');
+                toPrint[y][x]='g';
 
             else if (type == CORAL)
-                rowTmp.push_back('c');
+                toPrint[y][x]='c';
 
             else if (type == DIAMOND)
-                rowTmp.push_back('d');
+                toPrint[y][x]='d';
 
             else if (type == BONE)
-                rowTmp.push_back('b');
+                toPrint[y][x]='b';
 
             else 
-                rowTmp.push_back('.');
+                toPrint[y][x]='.';
         }
         toPrint.push_back(rowTmp);
     }

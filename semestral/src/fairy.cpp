@@ -30,11 +30,11 @@ void CFairy::Move(CPlayer & player, const CMap &map)
         int dir = rand()%4;
         if ( dir == 0 && m_X>0)
             m_X--;
-        else if ( dir == 1 && m_X<map.GetWidth() )
+        else if ( dir == 1 && m_X<map.GetWidth()-1 )
             m_X++;
         else if ( dir == 2 && m_Y>0 )
             m_Y--;
-        else if ( dir == 3 && m_Y<map.GetHeight())
+        else if ( dir == 3 && m_Y<map.GetHeight()-1 )
             m_Y++;
         
         m_Move = 0;
