@@ -2,7 +2,7 @@
 #include "game.h"
 #include <iostream>
 #include <fstream>
-#include <filesystem>
+#include <experimental/filesystem>
 #include <thread>
 #include <chrono>
 
@@ -18,14 +18,14 @@ std::string CGame::getFileName(const std::string &filePath)
 
 bool CGame::LoadGame(std::string &file)
 {
-    if (std::filesystem::is_empty("examples/saves"))
+    if (std::experimental::filesystem::is_empty("examples/saves"))
     {
         return false;
     }
     while (true)
     {
         std::cout << "Your saves:" << std::endl;
-        for (const auto &files : std::filesystem::directory_iterator("examples/saves"))
+        for (const auto &files : std::experimental::filesystem::directory_iterator("examples/saves"))
         {
             std::cout << getFileName(files.path()) << std::endl;
         }
@@ -34,7 +34,7 @@ bool CGame::LoadGame(std::string &file)
         std::string fileName;
         std::cin >> fileName;
         file.append(fileName);
-        if (std::filesystem::exists(file))
+        if (std::experimental::filesystem::exists(file))
             return true;
         else
         {
@@ -166,7 +166,7 @@ void CGame::SaveAndQuit()
 {
     std::cout << std::string(100, '\n');
     std::cout << "Your saves:" << std::endl;
-    for (const auto &files : std::filesystem::directory_iterator("examples/saves"))
+    for (const auto &files : std::experimental::filesystem::directory_iterator("examples/saves"))
     {
         std::cout << getFileName(files.path()) << std::endl;
     }

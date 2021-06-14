@@ -1,5 +1,5 @@
 #with help from David Bernhauer
-CXXFLAGS = -Wall -pedantic -std=c++17
+CXXFLAGS = -Wall -pedantic -std=c++14
 
 HEADERS = $(wildcard src/*.h)
 SOURCES = $(wildcard src/*.cpp)
@@ -20,7 +20,7 @@ jaklvinc: build/main
 
 build/main: $(OBJECTS)
 	mkdir -p $(@D)
-	g++ $^ -o $@
+	g++ $^ -o $@ -lstdc++fs
 
 build/%.o: src/%.cpp
 	mkdir -p $(@D)
