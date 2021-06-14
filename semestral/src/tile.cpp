@@ -7,3 +7,13 @@ CTile::CTile(int type,
     m_TileType = type;
     m_MineTime = MineTime;
 }
+
+int CTile::GetType() const 
+{ 
+    return m_TileType; 
+}
+
+int CTile::GetToughtness() const 
+{ 
+    return m_MineTime; 
+}

@@ -14,11 +14,6 @@ void CEntity::Move(CPlayer & player, const CMap &map)
 
 }
 
-void CEntity::Action( CPlayer & player, CMap & map )
-{
-
-}
-
 bool CEntity::GetUsed() const
 {
     return m_Used;

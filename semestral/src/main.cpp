@@ -10,7 +10,10 @@ int main(int argc, char *args[])
 
     game.Play();
 
-    game.SaveAndQuit();
+    if ( game.GetWin() )
+        game.Win();
+    else
+        game.SaveAndQuit();
 
     return 0;
 }

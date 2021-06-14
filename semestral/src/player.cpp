@@ -4,20 +4,6 @@
 #include <iostream>
 #include "enum.h"
 
-CPlayer::CPlayer(int x, int y) : m_PosX(x) , m_PosY(y)
-{
-}
-
-int CPlayer::GetX() const
-{
-    return m_PosX;
-}
-
-int CPlayer::GetY() const
-{
-    return m_PosY;
-}
-
 std::pair<int, int> CPlayer::NewPos(const char dir, const int width, const int height) const
 {
     int moveX = 0;
@@ -48,251 +34,7 @@ std::pair<int, int> CPlayer::NewPos(const char dir, const int width, const int h
     return std::make_pair(new_X, new_Y);
 }
 
-bool CPlayer::Load(std::string filename)
-{
-
-    std::ifstream data;
-    data.open(filename);
-    if (data.is_open())
-    {
-        std::string line;
-        std::getline(data, line);
-        std::stringstream ss(line);
-
-        ss >> m_PosX >> m_PosY;
-
-        if (m_PosX < 0 || m_PosY < 0)
-        {
-            return false;
-        }
-
-        std::getline(data, line);
-        ss = std::stringstream(line);
-        ss >> m_LvlLight >> m_LvlTank >> m_LvlDrill >> m_LvlBackpack >> m_Money;
-        if (m_LvlLight > 4 || m_LvlLight < 1 || m_LvlTank > 4 || m_LvlTank < 1 ||
-            m_LvlDrill > 4 || m_LvlDrill < 1 || m_LvlBackpack > 4 || m_LvlBackpack < 1 || m_Money < 0)
-        {
-            return false;
-        }
-
-        std::getline(data, line);
-        m_Health = stoi(line);
-        if (m_Health < 1)
-        {
-            return false;
-        }
-        m_MaxHealth = 150 * m_LvlTank;
-
-        if (!m_Inv.InitInv(filename, m_LvlBackpack))
-            return false;
-
-        return true;
-    }
-    else
-        return false;
-}
-
-bool CPlayer::Save(std::string filename)
-{
-    std::ofstream data;
-    data.open(filename);
-    if (data.is_open())
-    {
-        data << m_PosX << ' ' << m_PosY << ' ' << std::endl;
-        data << m_LvlLight << ' ' << m_LvlTank << ' ' << m_LvlDrill << ' ' << m_LvlBackpack << ' ' << m_Money << std::endl;
-        data << m_Health << std::endl;
-
-        data.close();
-        if (!m_Inv.SaveInv(filename))
-        {
-            return false;
-        }
-        return true;
-    }
-    return false;
-}
-
-int CPlayer::GetLight() const
-{
-    return m_LvlLight;
-}
-
-CInventory &CPlayer::GetInv()
-{
-    return m_Inv;
-}
-
-void CPlayer::Teleport( const CMap & map, int x , int y )
-{
-    if ( x >= 0 && y >= 0 && x < map.getWidth() && y < map.getHeight() )
-    {
-        m_PosX=x;
-        m_PosY=y;
-    }
-    return;
-}
-
-void CPlayer::Move(const CMap &map, char dir)
-{
-    std::pair<int, int> new_pos;
-    new_pos = NewPos(dir, map.getWidth(), map.getHeight());
-    m_PosX = new_pos.first;
-    m_PosY = new_pos.second;
-    return;
-}
-
-int CPlayer::MoveCost(const CMap &map, char dir) const
-{
-    std::pair<int, int> new_pos;
-    new_pos = NewPos(dir, map.getWidth(), map.getHeight());
-    if (new_pos.first == m_PosX && new_pos.second == m_PosY)
-        return 0;
-    else
-        return map.GetOnIndex(new_pos.first, new_pos.second).getToughtness();
-}
-
-void CPlayer::Mine(CMap & map)
-{
-    CTile new_tile('.',1);
-    CTile tile = map.GetOnIndex(m_PosX, m_PosY);
-    int tileType = tile.getType();
-
-    if (tileType != '.')
-    {
-        if (tileType == STONE)
-            m_Inv.AddToInv(STONE, 1);
-        else
-            m_Inv.AddToInv(tileType, (rand() % m_LvlDrill) + 1);
-    }
-
-    map.SetOnIndex(m_PosX, m_PosY, new_tile);
-    return;
-}
-
-void CPlayer::OxDown(int amount)
-{
-    m_Health -= amount;
-    if (m_Health <= 0)
-    {
-        Die();
-    }
-    return;
-}
-
-void CPlayer::OxReset()
-{
-    m_Health = m_MaxHealth;
-}
-
-void CPlayer::Die()
-{
-    m_PosY = 0;
-    OxReset();
-    m_Inv.Die();
-}
-
-bool CPlayer::UpgradeEquipent(int type)
-{
-    if (type == 1)
-    {
-        if (m_Money >= m_LvlLight * 5000)
-        {
-            m_Money -= m_LvlLight * 5000;
-            m_LvlLight++;
-        }
-        else
-            return false;
-    }
-    else if (type == 2)
-    {
-        if (m_Money >= m_LvlTank * 5000)
-        {
-            m_Money -= m_LvlTank * 5000;
-            m_LvlTank++;
-        }
-        else
-            return false;
-    }
-    else if (type == 3)
-    {
-        if (m_Money >= m_LvlDrill * 5000)
-        {
-            m_Money -= m_LvlDrill * 5000;
-            m_LvlDrill++;
-        }
-        else
-            return false;
-    }
-    else if (type == 4)
-    {
-        if (m_Money >= m_LvlBackpack * 5000)
-        {
-            m_Money -= m_LvlBackpack * 5000;
-            m_LvlBackpack++;
-        }
-        else
-            return false;
-    }
-    return true;
-}
-
-void CPlayer::ShowPos(std::vector<std::vector<char>> & toPrint)
-{
-    toPrint[m_PosY][m_PosX]='P';
-}
-
-void CPlayer::PrintStats() const
-{
-    std::cout << "\033[31m"
-              << "OXYGEN: " << m_Health << "\033[34m"
-              << " |  LIGHT LVL: " << m_LvlLight << " |  OXYGEN TANK LVL: " << m_LvlTank << " |  DRILL LVL: " << m_LvlDrill << " |  BACKPACK LVL: " << m_LvlBackpack << std::endl;
-    std::cout << "\033[32m"
-              << "MONEY: " << m_Money << "\033[0m" << std::endl;
-}
-
-void CPlayer::PrintInvCapacity() const
-{
-    m_Inv.PrintCapacity();
-}
-
-void CPlayer::Inventory()
-{
-    char sell;
-    m_Inv.Print();
-    std::cout << "\033[32m"
-              << "MONEY: " << m_Money << "\033[0m" << std::endl;
-    std::cout << "Press \'s\' to sell all mined items, or any other button to leave the inventory." << std::endl;
-    while (std::cin >> sell)
-    {
-        if (sell != 's')
-            break;
-
-        if (m_PosY == 0)
-        {
-            int money = 0;
-            for (int i = 0; i < SIZE; i++)
-            {
-                money += m_Inv.GetPrice(i) * m_Inv.GetQuantity(i);
-            }
-            m_Inv.Reset();
-            m_Money += money;
-            m_Inv.Print();
-            std::cout << "\033[32m"
-                      << "MONEY: " << m_Money << "\033[0m" << std::endl;
-            std::cout << "You've sold your mined items for: " << money << std::endl;
-        }
-        else
-        {
-            m_Inv.Print();
-            std::cout << "\033[32m"
-                      << "MONEY: " << m_Money << "\033[0m" << std::endl;
-            std::cout << "You need to be on the surface to sell items from your inventory." << std::endl;
-        }
-    }
-    return;
-}
-
-void CPlayer::PrintEquipLvl(int lvl) const
+void CPlayer::PrintEquipLvl(const int lvl) const
 {
     for (int i = 0; i < lvl; i++)
     {
@@ -399,7 +141,273 @@ void CPlayer::PrintShop() const
         std::cout << "To upgrade BACKPACK to lvl " << m_LvlBackpack + 1 << " for " << m_LvlBackpack * 5000 << " press 4" << std::endl;
     else
         std::cout << "BACKPACK is already max lvl." << std::endl;
+    
+    std::cout << "Press any other button to leave the shop." << std::endl;
 }
+
+CPlayer::CPlayer()
+{
+
+}
+
+CPlayer::CPlayer(int x, int y) : m_PosX(x) , m_PosY(y)
+{
+}
+
+int CPlayer::GetX() const
+{
+    return m_PosX;
+}
+
+int CPlayer::GetY() const
+{
+    return m_PosY;
+}
+
+bool CPlayer::Load(std::string filename, CMap & map)
+{
+    std::ifstream data;
+    data.open(filename);
+    if (data.is_open())
+    {
+        std::string line;
+        std::getline(data, line);
+        std::stringstream ss(line);
+
+        ss >> m_PosX >> m_PosY;
+
+        if (m_PosX < 0 || m_PosX >= map.GetWidth() || m_PosY < 0 || m_PosY >= map.GetHeight() )
+        {
+            return false;
+        }
+
+        std::getline(data, line);
+        ss = std::stringstream(line);
+        ss >> m_LvlLight >> m_LvlTank >> m_LvlDrill >> m_LvlBackpack >> m_Money;
+        if (m_LvlLight > 4 || m_LvlLight < 1 || m_LvlTank > 4 || m_LvlTank < 1 ||
+            m_LvlDrill > 4 || m_LvlDrill < 1 || m_LvlBackpack > 4 || m_LvlBackpack < 1 || m_Money < 0)
+        {
+            return false;
+        }
+
+        std::getline(data, line);
+        m_Health = stoi(line);
+        if (m_Health < 1)
+        {
+            return false;
+        }
+        m_MaxHealth = 150 * m_LvlTank;
+
+        if (!m_Inv.InitInv(filename, m_LvlBackpack))
+            return false;
+
+        return true;
+    }
+    else
+        return false;
+}
+
+bool CPlayer::Save(std::string filename)
+{
+    std::ofstream data;
+    data.open(filename);
+    if (data.is_open())
+    {
+        data << m_PosX << ' ' << m_PosY << ' ' << std::endl;
+        data << m_LvlLight << ' ' << m_LvlTank << ' ' << m_LvlDrill << ' ' << m_LvlBackpack << ' ' << m_Money << std::endl;
+        data << m_Health << std::endl;
+
+        data.close();
+        if (!m_Inv.SaveInv(filename))
+        {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+int CPlayer::GetLight() const
+{
+    return m_LvlLight;
+}
+
+CInventory &CPlayer::GetInv()
+{
+    return m_Inv;
+}
+
+void CPlayer::Teleport( const CMap & map, int x , int y )
+{
+    if ( x >= 0 && y >= 0 && x < map.GetWidth() && y < map.GetHeight() )
+    {
+        m_PosX=x;
+        m_PosY=y;
+    }
+    return;
+}
+
+void CPlayer::Move(const CMap &map, char dir)
+{
+    std::pair<int, int> new_pos;
+    new_pos = NewPos(dir, map.GetWidth(), map.GetHeight());
+    m_PosX = new_pos.first;
+    m_PosY = new_pos.second;
+    return;
+}
+
+int CPlayer::MoveCost(const CMap &map, char dir) const
+{
+    std::pair<int, int> new_pos;
+    new_pos = NewPos(dir, map.GetWidth(), map.GetHeight());
+    if (new_pos.first == m_PosX && new_pos.second == m_PosY)
+        return 0;
+    else
+        return map.GetOnIndex(new_pos.first, new_pos.second).GetToughtness();
+}
+
+void CPlayer::Mine(CMap & map)
+{
+    CTile new_tile('.',1);
+    CTile tile = map.GetOnIndex(m_PosX, m_PosY);
+    int tileType = tile.GetType();
+
+    if (tileType != '.')
+    {
+        if (tileType == STONE)
+            m_Inv.AddToInv(STONE, 1);
+        else
+            m_Inv.AddToInv(tileType, (rand() % m_LvlDrill) + 1);
+    }
+
+    map.SetOnIndex(m_PosX, m_PosY, new_tile);
+    return;
+}
+
+void CPlayer::OxDown(int amount)
+{
+    m_Health -= amount;
+    if (m_Health <= 0)
+    {
+        Die();
+    }
+    return;
+}
+
+void CPlayer::OxReset()
+{
+    m_Health = m_MaxHealth;
+}
+
+void CPlayer::Die()
+{
+    m_PosY = 0;
+    OxReset();
+    m_Inv.Die();
+}
+
+bool CPlayer::UpgradeEquipment(int type)
+{
+    if (type == 1)
+    {
+        if (m_Money >= m_LvlLight * 5000)
+        {
+            m_Money -= m_LvlLight * 5000;
+            m_LvlLight++;
+        }
+        else
+            return false;
+    }
+    else if (type == 2)
+    {
+        if (m_Money >= m_LvlTank * 5000)
+        {
+            m_Money -= m_LvlTank * 5000;
+            m_LvlTank++;
+        }
+        else
+            return false;
+    }
+    else if (type == 3)
+    {
+        if (m_Money >= m_LvlDrill * 5000)
+        {
+            m_Money -= m_LvlDrill * 5000;
+            m_LvlDrill++;
+        }
+        else
+            return false;
+    }
+    else if (type == 4)
+    {
+        if (m_Money >= m_LvlBackpack * 5000)
+        {
+            m_Money -= m_LvlBackpack * 5000;
+            m_LvlBackpack++;
+        }
+        else
+            return false;
+    }
+    return true;
+}
+
+void CPlayer::ShowPos(std::vector<std::vector<char>> & toPrint) const
+{
+    toPrint[m_PosY][m_PosX]='P';
+}
+
+void CPlayer::PrintStats() const
+{
+    std::cout << "\033[31m"
+              << "OXYGEN: " << m_Health << "\033[34m"
+              << " |  LIGHT LVL: " << m_LvlLight << " |  OXYGEN TANK LVL: " << m_LvlTank << " |  DRILL LVL: " << m_LvlDrill << " |  BACKPACK LVL: " << m_LvlBackpack << std::endl;
+    std::cout << "\033[32m"
+              << "MONEY: " << m_Money << "\033[0m" << std::endl;
+}
+
+void CPlayer::PrintInvCapacity() const
+{
+    m_Inv.PrintCapacity();
+}
+
+void CPlayer::Inventory()
+{
+    char sell;
+    m_Inv.Print();
+    std::cout << "\033[32m"
+              << "MONEY: " << m_Money << "\033[0m" << std::endl;
+    std::cout << "Press \'s\' to sell all mined items, or any other button to leave the inventory." << std::endl;
+    while (std::cin >> sell)
+    {
+        if (sell != 's')
+            break;
+
+        if (m_PosY == 0)
+        {
+            int money = 0;
+            for (int i = 0; i < SIZE; i++)
+            {
+                money += m_Inv.GetPrice(i) * m_Inv.GetQuantity(i);
+            }
+            m_Inv.Reset();
+            m_Money += money;
+            m_Inv.Print();
+            std::cout << "\033[32m"
+                      << "MONEY: " << m_Money << "\033[0m" << std::endl;
+            std::cout << "You've sold your mined items for: " << money << std::endl;
+        }
+        else
+        {
+            m_Inv.Print();
+            std::cout << "\033[32m"
+                      << "MONEY: " << m_Money << "\033[0m" << std::endl;
+            std::cout << "You need to be on the surface to sell items from your inventory." << std::endl;
+        }
+    }
+    return;
+}
+
+
 
 void CPlayer::Shop()
 {
@@ -414,7 +422,7 @@ void CPlayer::Shop()
             break;
         }
 
-        if (UpgradeEquipent(type - '0'))
+        if (UpgradeEquipment(type - '0'))
         {
             this->PrintShop();
             std::cout << "\033[32m"
@@ -429,4 +437,12 @@ void CPlayer::Shop()
         }
     }
     return;
+}
+
+bool CPlayer::Win() const
+{
+    if ( m_LvlLight < 4 || m_LvlTank < 4 || m_LvlBackpack < 4 || m_LvlDrill < 4 || m_Money < 10000 )
+        return false;
+    else 
+        return true;
 }

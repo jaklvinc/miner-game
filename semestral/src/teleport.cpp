@@ -9,8 +9,8 @@ void CTeleport::Action( CPlayer & player, CMap & map )
     {
         player.Teleport(map,player.GetX(),0);
         
-        m_X = rand() % map.getWidth();
-        m_Y = rand() % ( map.getHeight() / 3 ) + ( ( map.getHeight() / 3 ) * 2 );
+        m_X = rand() % map.GetWidth();
+        m_Y = rand() % ( map.GetHeight() / 3 ) + ( ( map.GetHeight() / 3 ) * 2 );
     }
 }
 

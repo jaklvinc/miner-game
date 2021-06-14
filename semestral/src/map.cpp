@@ -14,7 +14,6 @@ CMap::CMap()
 
 const CTile &CMap::GetOnIndex(int x, int y) const
 {
-    //checks if asked index is in the map actually
     if (x >= m_Width || x < 0 || y >= m_Height || y < 0)
     {
         throw std::runtime_error("Searched tile not part of the map! \n");
@@ -23,16 +22,17 @@ const CTile &CMap::GetOnIndex(int x, int y) const
         return m_Map[y][x];
 }
 
-void CMap::SetOnIndex(int x, int y, CTile new_tile)
+void CMap::SetOnIndex(int x, int y, CTile newTile)
 {
-    if (!(x >= m_Width || x < 0 || y >= m_Height || y < 0))
+    if (x >= m_Width || x < 0 || y >= m_Height || y < 0)
     {
-        m_Map[y][x] = new_tile;
+        throw std::runtime_error("Searched tile not part of the map! \n");
     }
-    return;
+    else
+        m_Map[y][x] = newTile;
 }
 
-bool CMap::Save(std::string filename)
+bool CMap::Save(const std::string & filename)
 {
     std::string name = filename;
 
@@ -48,7 +48,7 @@ bool CMap::Save(std::string filename)
         {
             for (int x = 0; x < m_Width; x++)
             {
-                int type = m_Map[y][x].getType();
+                int type = m_Map[y][x].GetType();
                 if (type < 10)
                     data << type;
                 else
@@ -62,7 +62,7 @@ bool CMap::Save(std::string filename)
         return false;
 }
 
-bool CMap::Load(std::string filename)
+bool CMap::Load(const std::string & filename)
 {
     std::string name = filename;
 
@@ -133,9 +133,14 @@ bool CMap::Load(std::string filename)
                     rowTmp.push_back(tile);
                     break;
                 }
-                default:
-                    CTile tile('.', 1);
+                case '.'-'0':
+                {
+                    CTile tile('.',1);
                     rowTmp.push_back(tile);
+                    break;
+                }
+                default:
+                    return false;
                 }
             }
             m_Map.push_back(rowTmp);
@@ -146,7 +151,7 @@ bool CMap::Load(std::string filename)
         return false;
 }
 
-void CMap::ShowMap(std::vector<std::vector<char>> & toPrint)
+void CMap::ShowMap(std::vector<std::vector<char>> & toPrint) const
 {
     for (int y = 0; y < m_Height; y++)
     {
@@ -154,7 +159,7 @@ void CMap::ShowMap(std::vector<std::vector<char>> & toPrint)
 
         for (int x = 0; x < m_Width; x++)
         {
-            int type = m_Map[y][x].getType();
+            int type = m_Map[y][x].GetType();
             if (type == '.')
                 rowTmp.push_back('.');
 
@@ -190,7 +195,7 @@ void CMap::Regenerate()
     {
         for (int x = 0; x < m_Width; x++)
         {
-            if ( m_Map[y][x].getType()=='.' && m_Map[y+1][x].getType()!=CORAL && m_Map[y+1][x].getType()!='.' )
+            if ( m_Map[y][x].GetType()=='.' && m_Map[y+1][x].GetType()!=CORAL && m_Map[y+1][x].GetType()!='.' )
             {
                 int random = rand() % 500;
                 if ( random <= 1 )
@@ -201,4 +206,14 @@ void CMap::Regenerate()
             }
         }
     }
+}
+
+int CMap::GetWidth() const
+{
+    return m_Width;
+}
+
+int CMap::GetHeight() const
+{
+    return m_Height;
 }

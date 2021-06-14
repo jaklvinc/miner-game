@@ -5,11 +5,7 @@
 #include <sstream>
 #include <iostream>
 
-CInventory::CInventory()
-{
-}
-
-bool CInventory::InitInv(std::string filename, int BackpackLvl)
+bool CInventory::InitInv(const std::string filename,const int BackpackLvl)
 {
     m_maxLoad = BackpackLvl * 150;
     m_currentLoad = 0;
@@ -62,7 +58,7 @@ bool CInventory::InitInv(std::string filename, int BackpackLvl)
         return false;
 }
 
-bool CInventory::SaveInv(std::string filename) const
+bool CInventory::SaveInv(const std::string filename) const
 {
 
     std::ofstream data;
@@ -76,7 +72,29 @@ bool CInventory::SaveInv(std::string filename) const
     return false;
 }
 
-void CInventory::AddToInv(int type, int quantity)
+void CInventory::Reset()
+{
+    m_currentLoad = 0;
+    for (int i = 0; i < SIZE; i++)
+    {
+        m_Inv[i] = 0;
+    }
+}
+
+void CInventory::Die()
+{
+    int newCurLoad = 0;
+    for (int i = 0; i < SIZE; i++)
+    {
+        int newNumber = m_Inv[i] / 2;
+        m_Inv[i] = newNumber;
+        newCurLoad += m_Inv[i] * m_Weights[i];
+    }
+    m_currentLoad = newCurLoad;
+    return;
+}
+
+void CInventory::AddToInv(const int type, const int quantity)
 {
     for (int i = 0; i < quantity; i++)
     {
@@ -108,22 +126,22 @@ void CInventory::AddToInv(int type, int quantity)
     return;
 }
 
-int CInventory::GetWeight(int type) const
+int CInventory::GetWeight(const int type) const
 {
     return m_Weights[type];
 }
 
-int CInventory::GetPrice(int type) const
+int CInventory::GetPrice(const int type) const
 {
     return m_Prices[type];
 }
 
-int CInventory::GetQuantity(int type) const
+int CInventory::GetQuantity(const int type) const
 {
     return m_Inv[type];
 }
 
-void CInventory::PrintLine(int type) const
+void CInventory::PrintLine(const int type) const
 {
     std::cout << "    ";
     std::cout << m_Weights[type];
@@ -233,24 +251,3 @@ void CInventory::PrintCapacity() const
               << "INVENTORY CAPACITY: " << m_currentLoad << "/" << m_maxLoad << "\033[0m" << std::endl;
 }
 
-void CInventory::Die()
-{
-    int newCurLoad = 0;
-    for (int i = 0; i < SIZE; i++)
-    {
-        int newNumber = m_Inv[i] / 2;
-        m_Inv[i] = newNumber;
-        newCurLoad += m_Inv[i] * m_Weights[i];
-    }
-    m_currentLoad = newCurLoad;
-    return;
-}
-
-void CInventory::Reset()
-{
-    m_currentLoad = 0;
-    for (int i = 0; i < SIZE; i++)
-    {
-        m_Inv[i] = 0;
-    }
-}

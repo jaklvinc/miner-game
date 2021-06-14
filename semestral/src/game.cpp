@@ -45,15 +45,36 @@ bool CGame::LoadGame(std::string &file)
     }
 }
 
-void CGame::PrintDirections()
+void CGame::PrintLegend() const
+{
+    ClearScreen();
+    std::cout << "ORES:" << std::endl;
+    std::cout << "▓" << " STONE -> if mined always yields 1 stone (only thing not affected by drill lvl)" << std::endl << std::endl;
+    std::cout << "\033[31m" << "▓" << "\033[0m" << " IRON -> if mined yields iron" << std::endl << std::endl;
+    std::cout << "\033[33m" << "▓" << "\033[0m" << " GOLD -> if mined yields gold" << std::endl << std::endl;
+    std::cout << "\033[36m" << "▓" << "\033[0m" << " DIAMOND -> if mined yields diamonds" << std::endl << std::endl;
+    std::cout << "▒" << " BONE -> if mined yields bones" << std::endl << std::endl;
+    std::cout << "\033[32m" << "?" << "\033[0m" << " CORAL -> if mined yields corals (also regrows by itself)" << std::endl << std::endl;
+    
+    std::cout << "ENTITIES:" << std::endl;
+    std::cout << "\033[31m" << "Ø" << "\033[0m" << " BOMB -> if player gets to one square around, it will blow up a crater and takes 150 oxygen from player" << std::endl << std::endl;
+    std::cout << "\033[42;1m" << "%" << "\033[0m" << " FAIRY -> if player catches it, it will refill its oxygen and disappear for a couple of turns, then it appears again" << std::endl << std::endl;
+    std::cout << "\033[44;1m" << "@" << "\033[0m" << " TELEPORT -> if stepped on, it will teleport the player to the surface and randomly moves itself to a different place on a map" << std::endl << std::endl;
+    char random;
+    std::cin >> random;
+}
+
+void CGame::PrintDirections() const
 {
     std::cout << "Press \'w,a,s,d\' to move." << std::endl;
     std::cout << "Press \'e\' to open inventory." << std::endl;
     std::cout << "Press \'q\' to save and quit." << std::endl;
     std::cout << "Press \'r\' to open shop." << std::endl;
+    std::cout << "Press \'l\' to show legend." << std::endl;
+    std::cout << "BE SURE TO PRESS ENTER AFTER EACH KEYPRESS" << std::endl;
 }
 
-void CGame::Welcome()
+void CGame::Welcome() const
 {
     std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
     std::cout << "@                               Welcome to miner!                                @" << std::endl;
@@ -71,13 +92,14 @@ void CGame::Welcome()
     std::cout << "@────────────────────────────────────────────────────────────────────────────────@" << std::endl;
     std::cout << "@       Underground you can find these ores going up in rarity and price:        @" << std::endl;
     std::cout << "@              STONE , BONE , CORAL , IRON , GOLD and DIAMOND                    @" << std::endl;
-    std::cout << "@                                                                                @" << std::endl;
-    std::cout << "@    Also watch out for the animals, they don't like to see unfamiliar faces...  @" << std::endl;
+    std::cout << "@────────────────────────────────────────────────────────────────────────────────@" << std::endl;
+    std::cout << "@      Also watch out for different entities that float around the sea           @" << std::endl;
     std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;   
 }
 
 bool CGame::StartGame()
 {
+    m_Win = false;
     std::cout << "Choose from the following:" << std::endl;
     std::cout << "1 = START NEW GAME" << std::endl;
     std::cout << "2 = LOAD FROM A SAVE" << std::endl;
@@ -92,7 +114,7 @@ bool CGame::StartGame()
                 std::cout << "Map couldn't be loaded, your save may be corrupted, or it doesn't exist." << std::endl;
                 return false;
             }
-            if (!m_Player.Load("../examples/new_game/ng"))
+            if (!m_Player.Load("../examples/new_game/ng",m_Map))
             {
                 std::cout << "Player data couldn't be loaded, your save may be corrupted, or it doesn't exist." << std::endl;
                 return false;
@@ -119,7 +141,7 @@ bool CGame::StartGame()
                 std::cout << "Map couldn't be loaded, your save may be corrupted." << std::endl;
                 return false;
             }
-            if (!m_Player.Load(filename))
+            if (!m_Player.Load(filename,m_Map))
             {
                 std::cout << "Player data couldn't be loaded, your save may be corrupted." << std::endl;
                 return false;
@@ -175,12 +197,12 @@ void CGame::SaveAndQuit()
     return;
 }
 
-void CGame::ClearScreen()
+void CGame::ClearScreen() const
 {
     std::cout << std::string(100,'\n');
 }
 
-void CGame::PrintMap()
+void CGame::PrintMap() const
 {
     std::vector<std::vector<char>> toPrint;
     m_Map.ShowMap(toPrint);
@@ -188,11 +210,11 @@ void CGame::PrintMap()
     m_Player.ShowPos(toPrint);
     
 
-    for ( int y = -1 ; y <= m_Map.getHeight() ; y++  )
+    for ( int y = -1 ; y <= m_Map.GetHeight() ; y++  )
     {
-        for ( int x = -1 ; x <= m_Map.getWidth() ; x++ )
+        for ( int x = -1 ; x <= m_Map.GetWidth() ; x++ )
         {
-            if (y == -1 || x == -1 || y == m_Map.getHeight() || x == m_Map.getWidth())
+            if (y == -1 || x == -1 || y == m_Map.GetHeight() || x == m_Map.GetWidth())
             {
                 std::cout << '@';
             }
@@ -285,6 +307,10 @@ void CGame::Play()
         {
             m_Player.Inventory();
         }
+        else if ( ch == 'l' )
+        {
+            PrintLegend();
+        }
         else if (ch == 'r')
         {
             if (m_Player.GetY() == 0)
@@ -300,6 +326,12 @@ void CGame::Play()
         else
         {
             unknownCmd = true;
+        }
+
+        if ( m_Player.Win() )
+        {
+            m_Win = true;
+            return;
         }
 
         for (int i = 0; i < moveCost - 1; i++)
@@ -336,4 +368,40 @@ void CGame::Play()
             std::cout << "Please enter a valid command! Press \'i\' to show valid commands." << std::endl;
         //std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
+}
+
+void CGame::Win()
+{
+    ClearScreen();
+    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                           you win                                             @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@                                                                                               @" << std::endl;
+    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+}
+
+bool CGame::GetWin()
+{
+    return m_Win;
 }

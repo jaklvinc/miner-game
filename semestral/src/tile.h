@@ -1,26 +1,36 @@
 #pragma once
-#include <cstdlib>
-/* 
-    A = air
-    S = stone
-    C = coral
-    I = iron
-    G = gold
-    B = bone
-    D = Diamond
-*/
 
+/**
+ * Class that stores tiles, used in a map.
+ * 
+ * Each tile has a type and mine time.
+ */
 class CTile
 {
 protected:
     int m_TileType;
-    int m_MineTime; // sets the energy used to mine certain Tile
+    int m_MineTime;
 public:
-    CTile(){};
+    /**
+     * Constructor with types
+     * 
+     * @param[in] type Sets the type of this tile.
+     * @param[in] mineTime Sets how many turns is needed to mine this.
+     */
     CTile(int type,
-          int MineTime);
+          int mineTime);
 
-    //getters for the member properties
-    int getType() const { return m_TileType; };
-    int getToughtness() const { return m_MineTime; };
+    /**
+     * Getter for tile type.
+     * 
+     * @returns The type of this tile
+     */
+    int GetType() const;
+
+    /**
+     * Getter for tile mine time.
+     * 
+     * @returns The mining time of this tile
+     */
+    int GetToughtness() const;
 };
