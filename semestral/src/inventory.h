@@ -54,8 +54,16 @@ public:
      * 
      * @param[in] type the type of item to be added
      * @param[in] quantity the quantity of specified item to be added
+     * @param[in] backpackLvl the level of players backpack
      */
-    void AddToInv(const int type, const int quantity);
+    void AddToInv(const int type, const int quantity, const int backpackLvl);
+
+    /**
+     * Updates the max size of inventory
+     * 
+     * @param[in] size to what size to update the invenrtory
+     */
+    void UpdateSize( int size );
 
     /**
      * Resets the inventory

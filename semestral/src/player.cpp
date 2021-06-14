@@ -123,22 +123,22 @@ void CPlayer::PrintShop() const
               << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
               << "\033[0m" << std::endl;
     if (m_LvlLight < 4)
-        std::cout << "To upgrade LIGHT to lvl " << m_LvlLight + 1 << " for " << m_LvlLight * 5000 << " press 1" << std::endl;
+        std::cout << "To upgrade LIGHT to lvl " << m_LvlLight + 1 << " for " << m_LvlLight * 3000 << " press 1" << std::endl;
     else
         std::cout << "LIGHT is already max lvl." << std::endl;
 
     if (m_LvlTank < 4)
-        std::cout << "To upgrade OXYGEN TANK to lvl " << m_LvlTank + 1 << " for " << m_LvlTank * 5000 << " press 2" << std::endl;
+        std::cout << "To upgrade OXYGEN TANK to lvl " << m_LvlTank + 1 << " for " << m_LvlTank * 3000 << " press 2" << std::endl;
     else
         std::cout << "OXYGEN TANK is already max lvl." << std::endl;
 
     if (m_LvlDrill < 4)
-        std::cout << "To upgrade DRILL to lvl " << m_LvlDrill + 1 << " for " << m_LvlDrill * 5000 << " press 3" << std::endl;
+        std::cout << "To upgrade DRILL to lvl " << m_LvlDrill + 1 << " for " << m_LvlDrill * 3000 << " press 3" << std::endl;
     else
         std::cout << "DRILL is already max lvl." << std::endl;
 
     if (m_LvlBackpack < 4)
-        std::cout << "To upgrade BACKPACK to lvl " << m_LvlBackpack + 1 << " for " << m_LvlBackpack * 5000 << " press 4" << std::endl;
+        std::cout << "To upgrade BACKPACK to lvl " << m_LvlBackpack + 1 << " for " << m_LvlBackpack * 3000 << " press 4" << std::endl;
     else
         std::cout << "BACKPACK is already max lvl." << std::endl;
     
@@ -275,9 +275,9 @@ void CPlayer::Mine(CMap & map)
     if (tileType != '.')
     {
         if (tileType == STONE)
-            m_Inv.AddToInv(STONE, 1);
+            m_Inv.AddToInv(STONE, 1, m_LvlBackpack);
         else
-            m_Inv.AddToInv(tileType, (rand() % m_LvlDrill) + 1);
+            m_Inv.AddToInv(tileType, (rand() % m_LvlDrill) + 1,m_LvlBackpack);
     }
 
     map.SetOnIndex(m_PosX, m_PosY, new_tile);
@@ -310,9 +310,9 @@ bool CPlayer::UpgradeEquipment(int type)
 {
     if (type == 1)
     {
-        if (m_Money >= m_LvlLight * 5000 && m_LvlLight < 4)
+        if (m_Money >= m_LvlLight * 3000 && m_LvlLight < 4)
         {
-            m_Money -= m_LvlLight * 5000;
+            m_Money -= m_LvlLight * 3000;
             m_LvlLight++;
         }
         else
@@ -320,19 +320,20 @@ bool CPlayer::UpgradeEquipment(int type)
     }
     else if (type == 2)
     {
-        if (m_Money >= m_LvlTank * 5000 && m_LvlTank < 4 )
+        if (m_Money >= m_LvlTank * 3000 && m_LvlTank < 4 )
         {
-            m_Money -= m_LvlTank * 5000;
+            m_Money -= m_LvlTank * 3000;
             m_LvlTank++;
+            m_MaxHealth = m_LvlTank * 150;
         }
         else
             return false;
     }
     else if (type == 3)
     {
-        if (m_Money >= m_LvlDrill * 5000 && m_LvlDrill < 4)
+        if (m_Money >= m_LvlDrill * 3000 && m_LvlDrill < 4)
         {
-            m_Money -= m_LvlDrill * 5000;
+            m_Money -= m_LvlDrill * 3000;
             m_LvlDrill++;
         }
         else
@@ -340,10 +341,11 @@ bool CPlayer::UpgradeEquipment(int type)
     }
     else if (type == 4)
     {
-        if (m_Money >= m_LvlBackpack * 5000 && m_LvlBackpack < 4)
+        if (m_Money >= m_LvlBackpack * 3000 && m_LvlBackpack < 4)
         {
-            m_Money -= m_LvlBackpack * 5000;
+            m_Money -= m_LvlBackpack * 3000;
             m_LvlBackpack++;
+            m_Inv.UpdateSize(m_LvlBackpack*150);
         }
         else
             return false;

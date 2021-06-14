@@ -365,7 +365,6 @@ void CGame::Play()
             std::cout << "You can only open shop at the top layer." << std::endl;
         if (unknownCmd)
             std::cout << "Please enter a valid command! Press \'i\' to show valid commands." << std::endl;
-        //std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
 
@@ -373,30 +372,11 @@ void CGame::Win()
 {
     ClearScreen();
     std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
+    for ( int i = 0 ; i < 10 ; i++ )
+        std::cout << "@                                                                                               @" << std::endl;
     std::cout << "@                                           you win                                             @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
-    std::cout << "@                                                                                               @" << std::endl;
+    for ( int i = 0 ; i < 10 ; i++ )
+        std::cout << "@                                                                                               @" << std::endl;
     std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
 }
 

@@ -40,7 +40,7 @@ bool CInventory::InitInv(const std::string filename,const int BackpackLvl)
         m_Weights[GOLD] = 15;
         m_Weights[DIAMOND] = 5;
 
-        m_Prices[BONE] = 50;
+        m_Prices[BONE] = 20;
         m_Prices[CORAL] = 100;
         m_Prices[STONE] = 20;
         m_Prices[IRON] = 200;
@@ -72,6 +72,11 @@ bool CInventory::SaveInv(const std::string filename) const
     return false;
 }
 
+void CInventory::UpdateSize( int size )
+{
+    m_maxLoad = size;
+}
+
 void CInventory::Reset()
 {
     m_currentLoad = 0;
@@ -94,12 +99,14 @@ void CInventory::Die()
     return;
 }
 
-void CInventory::AddToInv(const int type, const int quantity)
+void CInventory::AddToInv(const int type, const int quantity , const int backpackLvl)
 {
+    m_maxLoad = backpackLvl * 150;
     for (int i = 0; i < quantity; i++)
     {
         if (m_currentLoad + m_Weights[type] > m_maxLoad)
-        {
+        {   
+            std::cout << "INVENTORY FULL" << std::endl;
             return;
         }
         else
