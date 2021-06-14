@@ -36,6 +36,7 @@ public:
     int GetY() const;
 
     void Move(const CMap &map, const char direction);
+    void Teleport( const CMap &map, int x , int y );
     int MoveCost(const CMap &map, const char direction) const;
     void Mine(CMap &map);
     void OxDown(const int amount);

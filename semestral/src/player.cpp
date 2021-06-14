@@ -122,6 +122,16 @@ CInventory &CPlayer::GetInv()
     return m_Inv;
 }
 
+void CPlayer::Teleport( const CMap & map, int x , int y )
+{
+    if ( x >= 0 && y >= 0 && x < map.getWidth() && y < map.getHeight() )
+    {
+        m_PosX=x;
+        m_PosY=y;
+    }
+    return;
+}
+
 void CPlayer::Move(const CMap &map, char dir)
 {
     std::pair<int, int> new_pos;
@@ -138,14 +148,14 @@ int CPlayer::MoveCost(const CMap &map, char dir) const
     if (new_pos.first == m_PosX && new_pos.second == m_PosY)
         return 0;
     else
-        return map.GetOnIndex(new_pos.first, new_pos.second)->getToughtness();
+        return map.GetOnIndex(new_pos.first, new_pos.second).getToughtness();
 }
 
 void CPlayer::Mine(CMap & map)
 {
-    auto new_tile = std::make_shared<CAirB>();
-    std::shared_ptr<CTile> tile = map.GetOnIndex(m_PosX, m_PosY);
-    int tileType = tile->getType();
+    CTile new_tile('.',1);
+    CTile tile = map.GetOnIndex(m_PosX, m_PosY);
+    int tileType = tile.getType();
 
     if (tileType != '.')
     {

@@ -97,9 +97,9 @@ bool CGame::StartGame()
                 std::cout << "Player data couldn't be loaded, your save may be corrupted, or it doesn't exist." << std::endl;
                 return false;
             }
-            if ( !LoadTraps("../examples/new_game/ng") )
+            if ( !m_Entities.LoadEntities("../examples/new_game/ng",m_Map) )
             {
-                std::cout << " Trap data couldn't be loaded, your save may be corrupted." << std::endl;
+                std::cout << "Entity data couldn't be loaded, your save may be corrupted." << std::endl;
                 return false;
             }
             return true;
@@ -124,9 +124,9 @@ bool CGame::StartGame()
                 std::cout << "Player data couldn't be loaded, your save may be corrupted." << std::endl;
                 return false;
             }
-            if ( !LoadTraps(filename) )
+            if ( !m_Entities.LoadEntities(filename,m_Map) )
             {
-                std::cout << " Trap data couldn't be loaded, your save may be corrupted." << std::endl;
+                std::cout << "Entity data couldn't be loaded, your save may be corrupted." << std::endl;
                 return false;
             }
             return true;
@@ -166,9 +166,9 @@ void CGame::SaveAndQuit()
         return;
     }
 
-    if (!SaveTraps(outFilename))
+    if (!m_Entities.SaveEntities(outFilename))
     {
-        std::cout << "Traps couldn't be saved." << std::endl;
+        std::cout << "Entities couldn't be saved." << std::endl;
         return;
     }
 
@@ -184,7 +184,7 @@ void CGame::PrintMap()
 {
     std::vector<std::vector<char>> toPrint;
     m_Map.ShowMap(toPrint);
-    ShowTraps(toPrint);
+    m_Entities.ShowEntities(toPrint);
     m_Player.ShowPos(toPrint);
     
 
@@ -196,7 +196,7 @@ void CGame::PrintMap()
             {
                 std::cout << '@';
             }
-            else if (abs(m_Player.GetX() - x) <= m_Player.GetLight()*100 && abs(m_Player.GetY() - y) <= m_Player.GetLight() * 50 + 1)
+            else if (abs(m_Player.GetX() - x) <= m_Player.GetLight() && abs(m_Player.GetY() - y) <= m_Player.GetLight()/2 + 1)
             {
                 int type = toPrint[y][x];
                 if (type == '.')
@@ -236,6 +236,11 @@ void CGame::PrintMap()
                               << '%' 
                               << "\033[0m";
                 
+                else if ( type == 'T' )
+                    std::cout << "\033[44;1m" 
+                              << '@' 
+                              << "\033[0m";
+
                 else if ( type == 'P' )
                     std::cout << "\033[34;1m"
                               << "╬"
@@ -299,8 +304,8 @@ void CGame::Play()
 
         for (int i = 0; i < moveCost - 1; i++)
         {
-            MoveTraps();
-            AttackTraps();
+            m_Entities.MoveEntities(m_Player,m_Map);
+            m_Entities.ActionEntities(m_Player,m_Map);
             m_Player.OxDown(5);
             m_Map.Regenerate();
             ClearScreen();
@@ -310,9 +315,9 @@ void CGame::Play()
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
         m_Map.Regenerate();
-        MoveTraps();
+        m_Entities.MoveEntities(m_Player,m_Map);
         m_Player.Move(m_Map, ch);
-        AttackTraps();
+        m_Entities.ActionEntities(m_Player,m_Map);
         if (m_Player.GetY() == 0)
             m_Player.OxReset();
         else if (ch == 'w' || ch == 's' || ch == 'a' || ch == 'd')
@@ -330,111 +335,5 @@ void CGame::Play()
         if (unknownCmd)
             std::cout << "Please enter a valid command! Press \'i\' to show valid commands." << std::endl;
         //std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
-}
-
-bool CGame::LoadTraps( std::string filename )
-{
-    std::ifstream data;
-    data.open(filename);
-
-    if (data.is_open())
-    {
-        std::string line;
-        for (int i = 0; i < 6; i++)
-        std::getline(data, line);
-        int width, height;
-        std::stringstream ss(line);
-
-        ss >> width >> height;
-
-        for ( int i = 0; i < height ; i++)
-        std::getline(data,line);
-
-        while ( std::getline(data,line) )
-        {
-            char type;
-            std::stringstream ss(line);
-            ss >> type;
-
-            if ( type == 'B' )
-            {
-                int x , y;
-                ss >> x >> y;
-                if ( x < 0 || y < 0 || x >= m_Map.getWidth() || y >= m_Map.getHeight() )
-                    return false;
-                auto bomb = std::make_shared<CBomb>(x,y);
-                m_Traps.push(bomb);
-            }
-            else if ( type == 'F')
-            {
-                int x , y , cooldown, move;
-                ss >> x >> y >> cooldown >> move;
-                if ( x < 0 || y < 0 || x >= m_Map.getWidth() || y >= m_Map.getHeight() || cooldown < 0 || cooldown > 7 || move > 1 || move < 0 )
-                    return false;
-                auto fairy = std::make_shared<CFairy>(x,y,cooldown,move);
-                m_Traps.push(fairy);
-            }
-            else
-                return false;
-        }
-        return true;
-    }
-    else
-        return false;
-}
-
-bool CGame::SaveTraps( std::string filename )
-{
-    std::ofstream data(filename, std::ios_base::app);
-    if (data.is_open())
-    {
-        while ( ! m_Traps.empty() )
-        {
-            std::shared_ptr<CTrap> trap = m_Traps.front();
-            m_Traps.pop();
-            trap->Save(data);
-        }
-        return true;
-    }
-    else
-        return false;
-}
-
-void CGame::ShowTraps( std::vector<std::vector<char>> & toPrint )
-{
-    for ( size_t i = 0 ; i < m_Traps.size() ; i++ )
-    {
-        auto trap=m_Traps.front();
-        m_Traps.pop();
-        int x = trap->GetX();
-        int y = trap->GetY();
-        char appearance = trap->Appearance();
-        if( appearance != '.' )
-            toPrint[y][x]=appearance;
-        m_Traps.push(trap);
-    }
-}
-
-void CGame::MoveTraps()
-{
-    for ( size_t i = 0 ; i < m_Traps.size() ; i++ )
-    {
-        auto trap=m_Traps.front();
-        m_Traps.pop();
-        trap->Move(m_Player,m_Map);
-        m_Traps.push(trap);
-    }
-}
-
-void CGame::AttackTraps()
-{
-    for ( size_t i = 0 ; i < m_Traps.size() ; i++ )
-    {
-        auto trap=m_Traps.front();
-        m_Traps.pop();
-        trap->Attack(m_Player,m_Map);
-        if (! trap->GetUsed())
-            m_Traps.push(trap);
     }
 }

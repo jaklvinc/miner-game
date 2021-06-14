@@ -12,7 +12,7 @@ CMap::CMap()
     m_Width = 0;
 }
 
-const std::shared_ptr<CTile> &CMap::GetOnIndex(int x, int y) const
+const CTile &CMap::GetOnIndex(int x, int y) const
 {
     //checks if asked index is in the map actually
     if (x >= m_Width || x < 0 || y >= m_Height || y < 0)
@@ -23,7 +23,7 @@ const std::shared_ptr<CTile> &CMap::GetOnIndex(int x, int y) const
         return m_Map[y][x];
 }
 
-void CMap::SetOnIndex(int x, int y, std::shared_ptr<CTile> new_tile)
+void CMap::SetOnIndex(int x, int y, CTile new_tile)
 {
     if (!(x >= m_Width || x < 0 || y >= m_Height || y < 0))
     {
@@ -48,7 +48,7 @@ bool CMap::Save(std::string filename)
         {
             for (int x = 0; x < m_Width; x++)
             {
-                int type = m_Map[y][x]->getType();
+                int type = m_Map[y][x].getType();
                 if (type < 10)
                     data << type;
                 else
@@ -88,7 +88,7 @@ bool CMap::Load(std::string filename)
             std::getline(data, line);
             std::stringstream ss(line);
 
-            std::vector<std::shared_ptr<CTile>> rowTmp;
+            std::vector<CTile> rowTmp;
             for (int x = 0; x < m_Width; x++)
             {
                 char type;
@@ -99,42 +99,42 @@ bool CMap::Load(std::string filename)
                 {
                 case STONE:
                 {
-                    auto tile = std::make_shared<CStoneB>();
+                    CTile tile(STONE, 2);
                     rowTmp.push_back(tile);
                     break;
                 }
                 case BONE:
                 {
-                    auto tile = std::make_shared<CBoneB>();
+                    CTile tile(BONE, 1);
                     rowTmp.push_back(tile);
                     break;
                 }
                 case CORAL:
                 {
-                    auto tile = std::make_shared<CCoralB>();
+                    CTile tile(CORAL, 1);
                     rowTmp.push_back(tile);
                     break;
                 }
                 case IRON:
                 {
-                    auto tile = std::make_shared<CIronB>();
+                    CTile tile(IRON, 2);
                     rowTmp.push_back(tile);
                     break;
                 }
                 case GOLD:
                 {
-                    auto tile = std::make_shared<CGoldB>();
+                    CTile tile(GOLD, 3);
                     rowTmp.push_back(tile);
                     break;
                 }
                 case DIAMOND:
                 {
-                    auto tile = std::make_shared<CDiamondB>();
+                    CTile tile(DIAMOND, 4);
                     rowTmp.push_back(tile);
                     break;
                 }
                 default:
-                    auto tile = std::make_shared<CAirB>();
+                    CTile tile('.', 1);
                     rowTmp.push_back(tile);
                 }
             }
@@ -154,7 +154,7 @@ void CMap::ShowMap(std::vector<std::vector<char>> & toPrint)
 
         for (int x = 0; x < m_Width; x++)
         {
-            int type = m_Map[y][x]->getType();
+            int type = m_Map[y][x].getType();
             if (type == '.')
                 rowTmp.push_back('.');
 
@@ -190,12 +190,12 @@ void CMap::Regenerate()
     {
         for (int x = 0; x < m_Width; x++)
         {
-            if ( m_Map[y][x]->getType()=='.' && m_Map[y+1][x]->getType()!=CORAL && m_Map[y+1][x]->getType()!='.' )
+            if ( m_Map[y][x].getType()=='.' && m_Map[y+1][x].getType()!=CORAL && m_Map[y+1][x].getType()!='.' )
             {
-                int random = rand() % 200;
+                int random = rand() % 500;
                 if ( random <= 1 )
                 {
-                    auto coral = std::make_shared<CCoralB>();
+                    CTile coral(CORAL,1);
                     m_Map[y][x] = coral;
                 }
             }
