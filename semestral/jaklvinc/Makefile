@@ -35,24 +35,40 @@ clean:
 
 
 build/bomb.o: src/bomb.cpp src/bomb.h src/entity.h src/player.h src/inventory.h \
- src/map.h src/tile.h
+ src/stone.h src/item.h src/iron.h src/gold.h src/diamond.h src/coral.h \
+ src/bone.h src/map.h src/tile.h
+build/bone.o: src/bone.cpp src/bone.h src/item.h
+build/coral.o: src/coral.cpp src/coral.h src/item.h
+build/diamond.o: src/diamond.cpp src/diamond.h src/item.h
 build/entity.o: src/entity.cpp src/entity.h src/player.h src/inventory.h \
- src/map.h src/tile.h
+ src/stone.h src/item.h src/iron.h src/gold.h src/diamond.h src/coral.h \
+ src/bone.h src/map.h src/tile.h
 build/entityHandler.o: src/entityHandler.cpp src/entityHandler.h src/fairy.h \
- src/entity.h src/player.h src/inventory.h src/map.h src/tile.h \
- src/bomb.h src/teleport.h
+ src/entity.h src/player.h src/inventory.h src/stone.h src/item.h \
+ src/iron.h src/gold.h src/diamond.h src/coral.h src/bone.h src/map.h \
+ src/tile.h src/bomb.h src/teleport.h
 build/fairy.o: src/fairy.cpp src/fairy.h src/entity.h src/player.h \
- src/inventory.h src/map.h src/tile.h
-build/game.o: src/game.cpp src/game.h src/player.h src/inventory.h src/map.h \
- src/tile.h src/entityHandler.h src/fairy.h src/entity.h src/bomb.h \
- src/teleport.h
-build/inventory.o: src/inventory.cpp src/inventory.h src/enum.h
-build/main.o: src/main.cpp src/game.h src/player.h src/inventory.h src/map.h \
- src/tile.h src/entityHandler.h src/fairy.h src/entity.h src/bomb.h \
- src/teleport.h
+ src/inventory.h src/stone.h src/item.h src/iron.h src/gold.h \
+ src/diamond.h src/coral.h src/bone.h src/map.h src/tile.h
+build/game.o: src/game.cpp src/game.h src/entityHandler.h src/fairy.h \
+ src/entity.h src/player.h src/inventory.h src/stone.h src/item.h \
+ src/iron.h src/gold.h src/diamond.h src/coral.h src/bone.h src/map.h \
+ src/tile.h src/bomb.h src/teleport.h src/enum.h
+build/gold.o: src/gold.cpp src/gold.h src/item.h
+build/inventory.o: src/inventory.cpp src/inventory.h src/stone.h src/item.h \
+ src/iron.h src/gold.h src/diamond.h src/coral.h src/bone.h src/enum.h
+build/iron.o: src/iron.cpp src/iron.h src/item.h
+build/item.o: src/item.cpp src/item.h
+build/main.o: src/main.cpp src/game.h src/entityHandler.h src/fairy.h \
+ src/entity.h src/player.h src/inventory.h src/stone.h src/item.h \
+ src/iron.h src/gold.h src/diamond.h src/coral.h src/bone.h src/map.h \
+ src/tile.h src/bomb.h src/teleport.h
 build/map.o: src/map.cpp src/map.h src/tile.h src/enum.h
-build/player.o: src/player.cpp src/player.h src/inventory.h src/map.h \
- src/tile.h src/enum.h
+build/player.o: src/player.cpp src/player.h src/inventory.h src/stone.h \
+ src/item.h src/iron.h src/gold.h src/diamond.h src/coral.h src/bone.h \
+ src/map.h src/tile.h src/enum.h
+build/stone.o: src/stone.cpp src/stone.h src/item.h
 build/teleport.o: src/teleport.cpp src/teleport.h src/entity.h src/player.h \
- src/inventory.h src/map.h src/tile.h
+ src/inventory.h src/stone.h src/item.h src/iron.h src/gold.h \
+ src/diamond.h src/coral.h src/bone.h src/map.h src/tile.h
 build/tile.o: src/tile.cpp src/tile.h src/enum.h

@@ -1,7 +1,14 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
+#include "stone.h"
+#include "iron.h"
+#include "gold.h"
+#include "diamond.h"
+#include "coral.h"
+#include "bone.h"
 
 /**
  * Class that saves information about inventory of player.
@@ -10,9 +17,7 @@ class CInventory
 {
 private:
     /** Stores number of each item in possesion */
-    int m_Inv[6];
-    int m_Prices[6];
-    int m_Weights[6];
+    std::shared_ptr<CItem> m_Inv[6];
 
     /** Stores current fullness of inventory */
     int m_currentLoad;
